@@ -24,6 +24,8 @@
   },
   "homepage": "https://github.com/smeans/neo#readme",
   "dependencies": {
-    "electron": "^1.6.11"
+    "electron": "^1.6.11",
+    "fs-extra": "^4.0.0",
+    "jquery": "^3.2.1"
   }
 }

@@ -2,24 +2,37 @@
 
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-
-  <title>[Site Name]: home</title>
-  <meta name="description" content="[Site Description]">
-  <meta name="author" content="[Author]">
-
+  <title>neo</title>
   <link rel="stylesheet" href="css/style.css?v=1.0">
-
-  <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
 </head>
 
 <body>
   <div id="stage">
-    
+    <div class="pane" id="user_info">
+      <form class="page_dialog" name="userStart">
+        <p><strong>Welcome to neo!</strong></p>
+        <p>Before you start writing, we need a little bit of information.</p>
+        <p><label>your (real) name:</label><input type="text" name="full_name" placeholder="Anonymous"/></p>
+        <p>
+          <input type="radio" name="writing_style" value="pantser" checked>&nbsp;I'm a pantser.
+          <input type="radio" name="writing_style" value="plotter">&nbsp;I'm a plotter.
+        </p>
+        <p><input type="checkbox" name="use_aliases">&nbsp;I'll be using a pen name.</p>
+        <p><input type="checkbox" name="get_contact">&nbsp;I'll be submitting manuscripts.</p>
+        <p><button type="submit">continue</button></p>
+      </form>
+    </div>
+    <div class="pane" id="bookcase">
+      <div class="shelf">
+        <div class="books">
+          <div class="new_book">
+            	<span class="icon">&#x2295;</span>
+          </div>
+        </div>
+        <h2>wip</h2>
+      </div>
+    </div>
   </div>
-  <script src="js/jquery-3.2.1.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

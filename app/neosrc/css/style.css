@@ -1,24 +1,104 @@
-html,body {
-  box-sizing: border-box;
-}
 *, *:before, *:after { box-sizing: inherit; }
 
-/* Set full height: http://stackoverflow.com/questions/6654958/make-body-have-100-of-the-browser-height */
-html {
-  /* body will set it's height based on its parent, which is html */
-  height: 100%;
-
-  /* set full width as well */
-  width: 100%;
+* {
+  font-family: Garamond, serif;
+  color: #333;
 }
+
+p {
+  margin-top: 0;
+}
+
+input {
+  font-family: Garamond, serif;
+  color: #333;
+}
+
+button {
+  background-color: #fff;
+  border-radius: .25em;
+  color: #333;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+
+  box-sizing: border-box;
+}
+
 body {
-  /* min-height is needed for pages that might scroll, ie they may contain _more_ than 100% of viewport height */
   min-height: 100%;
 
-  /* needed to prevent unwanted scroll-bars */
   margin: 0;
   padding: 0;
 
-  /* This is just so we can tell the body block apart from the app container */
   background-color: gray;
+}
+
+label {
+  margin-right: .25em;
+}
+
+.icon {
+  font-size: 50pt;
+  color: #2f2;
+}
+
+#stage {
+  width: 100%;
+  height: 100%;
+}
+
+.pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-color: #fff;
+
+  text-align: center;
+}
+
+.page_dialog {
+  font-size: 120%;
+
+  margin-top: .5em;
+  min-width: 40em;
+
+  text-align: left;
+
+  display: inline-block;
+  width: auto;
+  height: auto;
+  border: 1px solid #333;
+
+  padding: 1em;
+
+  box-shadow: 10px 10px 5px #888888;
+}
+
+.page_dialog input, .page_dialog button {
+  font-size: 120%;
+}
+
+div.shelf {
+  width: 100%;
+  background-color: #eee;
+  text-align: left;
+}
+
+div.books div {
+  height: 12em;
+  width: 10em;
+  background-color: #fff;
+  margin: 1em;
+}
+
+.new_book {
+  vertical-align: middle;
+  text-align: center;
 }

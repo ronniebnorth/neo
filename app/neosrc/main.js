@@ -2,9 +2,7 @@ const electron = require('electron');
 const neo = require('neo');
 const log = require('log');
 
-neo.CurrentAuthor = 'Scott';
 const app = electron.app;
-log.debug('app folder ' + app.getAppPath());
 
 const BrowserWindow = electron.BrowserWindow;
 
