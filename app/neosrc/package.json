@@ -1,0 +1,15 @@
+{
+  "name": "neosrc",
+  "version": "1.0.0",
+  "description": "The root source folder for the neo word processor.",
+  "main": "main.js",
+  "dependencies": {
+    "neo": "^1.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Scott Means",
+  "license": "Apache-2.0"
+}

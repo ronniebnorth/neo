@@ -1,0 +1,9 @@
+{
+  "opts": {
+    "recurse": true,
+    "destination": "neodocs"
+  },
+  "source": {
+    "include": ["neosrc/node_modules"]
+  }
+}

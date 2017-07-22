@@ -1,0 +1,29 @@
+{
+  "name": "neo",
+  "version": "1.0.0",
+  "description": "A tool for focused writing.",
+  "main": "main.js",
+  "scripts": {
+    "start": "LOG_LEVEL=debug electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smeans/neo.git"
+  },
+  "keywords": [
+    "Electron",
+    "neo",
+    "writing",
+    "word",
+    "processor"
+  ],
+  "author": "Scott Means",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/smeans/neo/issues"
+  },
+  "homepage": "https://github.com/smeans/neo#readme",
+  "dependencies": {
+    "electron": "^1.6.11"
+  }
+}
