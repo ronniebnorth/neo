@@ -1,2 +1,3 @@
 # neo
-A word processor for authors targeting ebook production based on Hugh Howey's blog post.
+A word processor for authors targeting ebook production based on Hugh Howey's blog post:
+[Neo - A Word Processor for Authors](http://www.hughhowey.com/neo-a-word-processor-for-authors/). This is not endorsed by Mr. Howey in any way, it's just a proof-of-concept project for me to play with implementing his ideas using [Electron](https://electron.atom.io/) for cross-platform HTML/CSS/JavaScript app development.
