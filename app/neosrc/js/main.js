@@ -11,8 +11,8 @@ const neo = remote.require('./neosrc/node_modules/neo');
 const log = remote.require('./neosrc/node_modules/log.js')
 
 function showPane(id) {
-  $('#stage>div.pane').addClass('hidden');
-  $('#' + id).removeClass('hidden');
+  $('#stage>div.pane').removeClass('active');
+  $('#' + id).addClass('active');
 }
 
 function showNextPane() {
@@ -52,6 +52,8 @@ function handleNewStory(e) {
 $(function () {
   $(document).on('submit', handleFormPost);
   $('.new_story').on('click', handleNewStory)
+
+  neo.StoryPane = '#story';
 
   neo.neoRoot = path.join(app.getPath('documents'), 'neo');
 

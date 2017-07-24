@@ -1,7 +1,7 @@
 *, *:before, *:after { box-sizing: inherit; }
 
 * {
-  font-family: Garamond, serif;
+  font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
   color: #333;
 }
 
@@ -10,7 +10,7 @@ p {
 }
 
 input {
-  font-family: Garamond, serif;
+  font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
   color: #333;
 }
 
@@ -61,6 +61,14 @@ label {
   height: 100%;
 }
 
+.stage>* {
+  visibility: hidden;
+}
+
+div.active {
+  visibility: visible;
+}
+
 .pane {
   position: absolute;
   top: 0;
@@ -90,27 +98,6 @@ label {
   padding: 1em;
 
   box-shadow: 10px 10px 5px #888888;
-}
-
-#story {
-  background-color: #000;
-}
-
-.story_page {
-  background-color: #fff;
-
-  width: 50em;
-  height: 100%;
-
-  margin-top: .5em;
-  min-width: 40em;
-
-  text-align: left;
-
-  display: inline-block;
-  border: 1px solid #333;
-
-  padding: 1em;
 }
 
 .page_dialog input, .page_dialog button {
@@ -144,4 +131,58 @@ div.books div {
 
 .books>div {
   cursor: pointer;
+}
+
+.story {
+  background-color: #000;
+
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.main {
+  flex: 1 0 50em;
+
+  min-width: 50em;
+  height: 100%;
+
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.work {
+  flex: 1 0;
+}
+
+.view_tabs {
+  flex: 0 0 2em;
+}
+
+.story_page {
+  flex: 1 0 50em;
+
+  background-color: #fff;
+
+  min-width: 50em;
+  height: 100%;
+
+  text-align: left;
+
+  display: inline-block;
+  border: 1px solid #333;
+
+  padding: 1em;
+}
+
+.gutter {
+  min-width: 15em;
+  flex: 0 1 15em;
+}
+
+.gutter.left {
+  background-color: red;
+}
+
+.gutter.right {
+  background-color: green;
 }
