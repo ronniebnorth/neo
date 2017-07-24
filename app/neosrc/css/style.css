@@ -25,6 +25,13 @@ html {
   width: 100%;
 
   box-sizing: border-box;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  overflow: hidden;
 }
 
 body {
@@ -43,6 +50,10 @@ label {
 .icon {
   font-size: 50pt;
   color: #2f2;
+}
+
+.hidden {
+  display: none;
 }
 
 #stage {
@@ -81,6 +92,27 @@ label {
   box-shadow: 10px 10px 5px #888888;
 }
 
+#story {
+  background-color: #000;
+}
+
+.story_page {
+  background-color: #fff;
+
+  width: 50em;
+  height: 100%;
+
+  margin-top: .5em;
+  min-width: 40em;
+
+  text-align: left;
+
+  display: inline-block;
+  border: 1px solid #333;
+
+  padding: 1em;
+}
+
 .page_dialog input, .page_dialog button {
   font-size: 120%;
 }
@@ -89,6 +121,7 @@ div.shelf {
   width: 100%;
   background-color: #eee;
   text-align: left;
+  padding: 1em;
 }
 
 div.books div {
@@ -98,7 +131,17 @@ div.books div {
   margin: 1em;
 }
 
-.new_book {
-  vertical-align: middle;
-  text-align: center;
+.new_story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.new_story .icon {
+
+}
+
+.books>div {
+  cursor: pointer;
 }

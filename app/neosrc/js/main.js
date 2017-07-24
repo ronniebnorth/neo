@@ -10,9 +10,16 @@ const $ = require('jquery');
 const neo = remote.require('./neosrc/node_modules/neo');
 const log = remote.require('./neosrc/node_modules/log.js')
 
+function showPane(id) {
+  $('#stage>div.pane').addClass('hidden');
+  $('#' + id).removeClass('hidden');
+}
+
 function showNextPane() {
-  if (neo.CurrentUser) {
-    $('#user_info').hide();
+  if (!neo.CurrentUser) {
+    showPane('user_info');
+  } else {
+    showPane('bookcase');
   }
 }
 
@@ -20,8 +27,6 @@ function userStartHandler(e) {
   var form = e.target;
 
   var user = new neo.User(form.full_name.value);
-
-  log.debug(user);
 
   neo.CurrentUser = user;
 }
@@ -34,11 +39,20 @@ function handleFormPost(e) {
   log.debug(e.target.name);
   form_handlers[e.target.name + 'Handler'](e);
 
+  showNextPane();
+
   return false;
+}
+
+function handleNewStory(e) {
+  neo.newStory();
+  showPane('story');
 }
 
 $(function () {
   $(document).on('submit', handleFormPost);
+  $('.new_story').on('click', handleNewStory)
+
   neo.neoRoot = path.join(app.getPath('documents'), 'neo');
 
   showNextPane();

@@ -8,7 +8,7 @@
 
 <body>
   <div id="stage">
-    <div class="pane" id="user_info">
+    <div class="pane hidden" id="user_info">
       <form class="page_dialog" name="userStart">
         <p><strong>Welcome to neo!</strong></p>
         <p>Before you start writing, we need a little bit of information.</p>
@@ -22,14 +22,18 @@
         <p><button type="submit">continue</button></p>
       </form>
     </div>
-    <div class="pane" id="bookcase">
+    <div class="pane hidden" id="bookcase">
       <div class="shelf">
         <div class="books">
-          <div class="new_book">
-            	<span class="icon">&#x2295;</span>
+          <div class="new_story">
+            <span class="icon">&#x2295;</span>
           </div>
         </div>
         <h2>wip</h2>
+      </div>
+    </div>
+    <div class="pane hidden" id="story">
+      <div class="story_page">
       </div>
     </div>
   </div>
