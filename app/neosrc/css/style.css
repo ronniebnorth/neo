@@ -5,6 +5,10 @@
   color: #333;
 }
 
+*:read-write:focus {
+     outline: none;
+}
+
 p {
   margin-top: 0;
 }
@@ -65,7 +69,7 @@ label {
   visibility: hidden;
 }
 
-div.active {
+.stage>div.active {
   visibility: visible;
 }
 
@@ -109,6 +113,11 @@ div.shelf {
   background-color: #eee;
   text-align: left;
   padding: 1em;
+}
+
+.shelf h2 {
+  font-family: monospace;
+  text-align: left;
 }
 
 div.books div {
@@ -169,7 +178,6 @@ div.books div {
   text-align: left;
 
   display: inline-block;
-  border: 1px solid #333;
 
   padding: 1em;
 }
@@ -185,4 +193,72 @@ div.books div {
 
 .gutter.right {
   background-color: green;
+}
+
+.view_tabs {
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-basis: row nowrap;
+  justify-content: space-between;
+}
+
+.view_tabs>* {
+  font-family: monospace;
+  font-size: 12pt;
+  font-weight: bolder;
+
+  background-color: #fff;
+
+  margin-right: .25em;
+  padding: .5em;
+  opacity: .7;
+  border-radius: 0 0 .75em .75em;
+
+  flex: 0 1;
+}
+
+.view_tabs>div:last-child {
+  margin-right: 0;
+}
+
+.view_tabs>.filler {
+  flex: 1 1;
+  opacity: 0;
+}
+
+.view_tabs div.active {
+  opacity: 1;
+}
+
+h1, h2, h3 {
+  width: 100%;
+  text-align: center;
+}
+
+h1.title {
+  margin-top: 35%;
+}
+
+.placeholder {
+  opacity: .75;
+}
+
+.chapter {
+  counter-increment: chapter;
+}
+
+.chapter:before {
+  content: counter(chapter);
+  font-size: 20pt;
+  font-weight: bold;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+p {
+  font-size: 14pt;
+  font-weight: 600;
 }
