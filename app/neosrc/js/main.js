@@ -63,8 +63,6 @@ $(function () {
   $(document).on('submit', handleFormPost);
   $('.new_story').on('click', handleNewStory)
 
-  $('#story').on('keypress', handleStoryKeypress);
-
   neo.BookcasePane = '#bookcase';
   neo.StoryPane = '#story';
 
