@@ -55,18 +55,43 @@ function handleFormPost(e) {
   return false;
 }
 
-function handleNewStory(e) {
-  neo.newStory();
+function syncBookcase() {
+  neo.Bookcase.Shelves.forEach(shelf => {
+    var shelf_div = $("#bookcase").find('div [data-name=' + shelf.name + ']');
+    if (!shelf_div.length) {
+      shelf_div = $('#templates .shelf').clone();
+      $(shelf_div).attr('data-name', shelf.name);
+      $(shelf_div).find('h2').text(shelf.name);
+
+      $("#bookcase").append(shelf_div);
+    } else {
+      shelf_div = shelf_div[0];
+    }
+
+    shelf.stories.forEach(story => {
+      var story_div = $(shelf_div).find('div [data-guid="' + story.metadata.guid + '"]');
+      if (!story_div.length) {
+        story_div = $('#templates .' + (story.isTemplate ? 'new_story' : 'story')).clone();
+        $(story_div).attr('data-guid', story.metadata.guid);
+        $(story_div).find('h3').text(story.metadata.title);
+
+        $(shelf_div).find('.books').append(story_div);
+      } else {
+        story_div = story_div[0];
+      }
+    });
+  });
 }
 
 $(function () {
   $(document).on('submit', handleFormPost);
-  $('.new_story').on('click', handleNewStory)
 
   neo.BookcasePane = '#bookcase';
   neo.StoryPane = '#story';
 
   neo.neoRoot = path.join(app.getPath('documents'), 'neo');
+
+  syncBookcase();
 
   showNextPane();
 });
