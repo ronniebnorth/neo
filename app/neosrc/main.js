@@ -1,6 +1,4 @@
 const electron = require('electron');
-const neo = require('neo');
-const log = require('log');
 
 const app = electron.app;
 

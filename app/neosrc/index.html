@@ -12,17 +12,19 @@
       <form class="page_dialog" name="userStart">
         <p><strong>Welcome to neo!</strong></p>
         <p>Before you start writing, we need a little bit of information.</p>
-        <p><label>your (real) name:</label><input type="text" name="full_name" placeholder="Anonymous"/></p>
+        <p><label>your (real) name:</label><input type="text" name="fullName" placeholder="Anonymous"/></p>
         <p>
-          <input type="radio" name="writing_style" value="pantser" checked>&nbsp;I'm a pantser.
-          <input type="radio" name="writing_style" value="plotter">&nbsp;I'm a plotter.
+          <input type="radio" name="writingStyle" value="pantser" checked>&nbsp;I'm a pantser.
+          <input type="radio" name="writingStyle" value="plotter">&nbsp;I'm a plotter.
         </p>
-        <p><input type="checkbox" name="use_aliases">&nbsp;I'll be using a pen name.</p>
-        <p><input type="checkbox" name="get_contact">&nbsp;I'll be submitting manuscripts.</p>
+        <p><input type="checkbox" name="useAliases">&nbsp;I'll be using a pen name.</p>
+        <p><input type="checkbox" name="getContact">&nbsp;I'll be submitting manuscripts.</p>
         <p><button type="submit">continue</button></p>
       </form>
     </div>
     <div class="pane" id="bookcase">
+      <div id="shelves">
+      </div>
     </div>
     <div class="pane story" id="story">
       <div class="gutter left">
@@ -45,11 +47,11 @@
       </div>
       <h2></h2>
     </div>
-    <div class="new_story">
+    <div class="cover template">
       <span class="icon">&#x2295;</span>
       <h3></h3>
     </div>
-    <div class="story">
+    <div class="cover story">
       <h3></h3>
     </div>
   </div>

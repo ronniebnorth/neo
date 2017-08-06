@@ -10,24 +10,24 @@ const first_lines = fs.readJsonSync('./neosrc/first_lines.json');
 const $ = require('jquery');
 
 // !!!TODO!!! fix Electron module search logic, should be able to use 'neo'
-const neo = remote.require('./neosrc/node_modules/neo');
-const log = remote.require('./neosrc/node_modules/log.js')
+const neo = require('neo');
+const log = require('log')
 
 function showPane(id) {
   var hiding = $('#stage>div.pane.active');
   if (hiding.length) {
-    document.dispatchEvent(new CustomEvent('hiding_pane', {'pane': hiding[0]}));
+    document.dispatchEvent(new CustomEvent('hiding_pane', {detail: {pane: hiding[0]}}));
 
     $('#stage>div.pane').removeClass('active');
   }
 
   var showing = $('#' + id);
-  document.dispatchEvent(new CustomEvent('showing_pane', {'pane': showing[0]}));
+  document.dispatchEvent(new CustomEvent('showing_pane', {detail: {'pane': showing[0]}}));
   $(showing).addClass('active');
 }
 
 function showNextPane() {
-  if (!neo.CurrentUser) {
+  if (!neo.CurrentUser.metadata.fullName) {
     showPane('user_info');
   } else {
     showPane('bookcase');
@@ -37,9 +37,10 @@ function showNextPane() {
 function userStartHandler(e) {
   var form = e.target;
 
-  var user = new neo.User(form.full_name.value);
-
-  neo.CurrentUser = user;
+  log.debug('full name', form.fullName.value);
+  neo.CurrentUser.updateChunk('jpf_metadata', metadata => {
+    metadata.fullName = form.fullName.value;
+  });
 }
 
 const form_handlers = {
@@ -55,15 +56,26 @@ function handleFormPost(e) {
   return false;
 }
 
+function handleBookClick(e) {
+  var storyDiv = $(e.target).closest('.cover');
+  if (storyDiv.length) {
+    var guid = $(storyDiv).attr('data-guid');
+    var story = neo.Bookcase.storyFromGuid(guid);
+    if (story && story.isTemplate) {
+      neo.CurrentStory = story.newStory();
+    }
+  }
+}
+
 function syncBookcase() {
   neo.Bookcase.Shelves.forEach(shelf => {
-    var shelf_div = $("#bookcase").find('div [data-name=' + shelf.name + ']');
+    var shelf_div = $("#shelves").find('div[data-name="' + shelf.name + '"]');
     if (!shelf_div.length) {
       shelf_div = $('#templates .shelf').clone();
       $(shelf_div).attr('data-name', shelf.name);
       $(shelf_div).find('h2').text(shelf.name);
 
-      $("#bookcase").append(shelf_div);
+      $("#shelves").append(shelf_div);
     } else {
       shelf_div = shelf_div[0];
     }
@@ -71,20 +83,40 @@ function syncBookcase() {
     shelf.stories.forEach(story => {
       var story_div = $(shelf_div).find('div [data-guid="' + story.metadata.guid + '"]');
       if (!story_div.length) {
-        story_div = $('#templates .' + (story.isTemplate ? 'new_story' : 'story')).clone();
+        story_div = $('#templates ' + (story.isTemplate ? '.template' : '.story')).clone();
         $(story_div).attr('data-guid', story.metadata.guid);
         $(story_div).find('h3').text(story.metadata.title);
 
         $(shelf_div).find('.books').append(story_div);
-      } else {
-        story_div = story_div[0];
       }
     });
   });
 }
 
+var bookcaseSyncTimer;
+
+function handleShowingPane(e) {
+  switch ($(e.detail.pane).attr('id')) {
+    case 'bookcase': {
+      bookcaseSyncTimer = setInterval(syncBookcase, 1000);
+    } break;
+  }
+}
+
+function handleHidingPane(e) {
+  switch ($(e.detail.pane).attr('id')) {
+    case 'bookcase': {
+      clearInterval(bookcaseSyncTimer);
+    } break;
+  }
+}
+
 $(function () {
   $(document).on('submit', handleFormPost);
+
+  $('#bookcase').on('click', handleBookClick);
+  $(document).on('showing_pane', handleShowingPane);
+  $(document).on('hiding_pane', handleHidingPane);
 
   neo.BookcasePane = '#bookcase';
   neo.StoryPane = '#story';
