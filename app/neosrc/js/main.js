@@ -61,8 +61,8 @@ function handleBookClick(e) {
   if (storyDiv.length) {
     var guid = $(storyDiv).attr('data-guid');
     var story = neo.Bookcase.storyFromGuid(guid);
-    if (story && story.isTemplate) {
-      neo.CurrentStory = story.newStory();
+    if (story) {
+      neo.CurrentStory = story.isTemplate ? story.newStory() : story;
     }
   }
 }
@@ -93,12 +93,28 @@ function syncBookcase() {
   });
 }
 
+function initStoryPane() {
+  var story = neo.CurrentStory;
+
+  $('#story .view_tabs').empty();
+  story.Tabs.forEach(function (tab) {
+    $('#story .view_tabs').append('<div>' + tab.name + '</div>');
+  });
+
+  // !!!LATER!!! get default tab from prefs
+  neo.CurrentTab = story.Tabs[0];
+}
+
 var bookcaseSyncTimer;
 
 function handleShowingPane(e) {
   switch ($(e.detail.pane).attr('id')) {
     case 'bookcase': {
       bookcaseSyncTimer = setInterval(syncBookcase, 1000);
+    } break;
+
+    case 'story': {
+      initStoryPane();
     } break;
   }
 }
@@ -111,12 +127,17 @@ function handleHidingPane(e) {
   }
 }
 
+function handleOpenStory(e) {
+  showPane('story');
+}
+
 $(function () {
   $(document).on('submit', handleFormPost);
 
   $('#bookcase').on('click', handleBookClick);
   $(document).on('showing_pane', handleShowingPane);
   $(document).on('hiding_pane', handleHidingPane);
+  $(document).on('open_story', handleOpenStory);
 
   neo.BookcasePane = '#bookcase';
   neo.StoryPane = '#story';

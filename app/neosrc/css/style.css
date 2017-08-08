@@ -177,21 +177,6 @@ div.books div {
   flex: 0 0 2em;
 }
 
-.story_page {
-  flex: 1 0 50em;
-
-  background-color: #fff;
-
-  min-width: 50em;
-  height: 100%;
-
-  text-align: left;
-
-  display: inline-block;
-
-  padding: 1em;
-}
-
 .gutter {
   min-width: 15em;
   flex: 0 1 15em;
@@ -243,10 +228,6 @@ div.books div {
 h1, h2, h3 {
   width: 100%;
   text-align: center;
-}
-
-h1.title {
-  margin-top: 35%;
 }
 
 .placeholder {
