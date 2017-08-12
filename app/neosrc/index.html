@@ -3,12 +3,80 @@
 <html lang="en">
 <head>
   <title>neo</title>
-  <link rel="stylesheet" href="css/style.css?v=1.0">
+
+  <script>
+  var head = document.querySelector('head');
+
+  function titleCase(s) {
+    return s && s[0].toUpperCase() + s.slice(1);
+  }
+
+  function nameToClassName(name) {
+    return name.split('-').map(titleCase).join('');
+  }
+
+  function classFromClassName(className) {
+    try {
+      return eval(className);
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+  var pohTemplates = {};
+
+  class PohElement extends HTMLElement {
+    constructor() {
+      super();
+
+      var root = this.createShadowRoot();
+      root.appendChild(this.constructor.template.content);
+    }
+
+    connectedCallback() {
+    }
+  }
+
+  class PohComponents extends HTMLElement{
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      this.querySelectorAll('template').forEach(function (template) {
+        var tagName = template.getAttribute('name');
+        if (!tagName) {
+          return;
+        }
+
+        var className = nameToClassName(tagName);
+
+        var mainScript = template.content.querySelector('script');
+        if (mainScript) {
+          head.appendChild(document.importNode(mainScript, true));
+          template.content.removeChild(mainScript);
+
+          var customClass = classFromClassName(className);
+          customClass.tagName = tagName;
+          customClass.template = document.importNode(template, true);
+          customElements.define(tagName, customClass || PohElement);
+        }
+      });
+    }
+  }
+
+  customElements.define('poh-components', PohComponents);
+  </script>
+
+  <link rel="stylesheet" href="css/nui.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <link rel="import" href="html/nui.html">
 </head>
 
 <body>
-  <div id="stage" class="stage">
-    <div class="pane" id="user_info">
+  <nui-stage>
+    <nui-pane id="user_info">
       <form class="page_dialog" name="userStart">
         <p><strong>Welcome to neo!</strong></p>
         <p>Before you start writing, we need a little bit of information.</p>
@@ -21,42 +89,47 @@
         <p><input type="checkbox" name="getContact">&nbsp;I'll be submitting manuscripts.</p>
         <p><button type="submit">continue</button></p>
       </form>
-    </div>
-    <div class="pane" id="bookcase">
-      <div id="shelves">
-      </div>
-    </div>
-    <div class="pane story" id="story">
-      <div class="gutter left">
+    </nui-pane>
+    <nui-pane id="bookcase">
+      <nui-bookcase>
+        <nui-shelves>
+        </nui-shelves>
+      </nui-bookcase>
+    </nui-pane>
+    <nui-pane id="story">
+      <nui-gutter class="left">
         <div class="story_nav">
           <button class="icon">&#x25c0;</button>
         </div>
-      </div>
-      <div class="main">
-        <div class="work">
-        </div>
-        <div class="view_tabs">
-        </div>
-      </div>
-      <div class="gutter right">
+      </nui-gutter>
+      <nui-main>
+        <nui-work>
+        </nui-work>
+        <nui-tabs>
+        </nui-tabs>
+      </nui-main>
+      <nui-gutter class="right">
         &nbsp;
-      </div>
-    </div>
-  </div>
-  <div id="templates">
-    <div class="shelf">
-      <div class="books">
-      </div>
+      </nui-gutter>
+    </nui-pane>
+  </nui-stage>
+
+  <nui-templates>
+    <nui-shelf>
+      <nui-books>
+      </nui-books>
       <h2></h2>
-    </div>
-    <div class="cover template">
-      <span class="icon">&#x2295;</span>
+    </nui-shelf>
+    <nui-cover class="template">
+      <nui-icon>&#x2295;</nui-icon>
       <h3></h3>
-    </div>
-    <div class="cover story">
+    </nui-cover>
+    <nui-cover class="story">
       <h3></h3>
-    </div>
-  </div>
+    </nui-cover>
+  </nui-templates>
+  <poh-templates>
+  </poh-templates>
   <script src="js/main.js"></script>
 </body>
 </html>

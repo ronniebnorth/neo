@@ -69,25 +69,25 @@ function handleBookClick(e) {
 
 function syncBookcase() {
   neo.Bookcase.Shelves.forEach(shelf => {
-    var shelf_div = $("#shelves").find('div[data-name="' + shelf.name + '"]');
+    var shelf_div = $('nui-shelves').find('nui-shelf[data-name="' + shelf.name + '"]');
     if (!shelf_div.length) {
-      shelf_div = $('#templates .shelf').clone();
+      shelf_div = $('nui-templates nui-shelf').clone();
       $(shelf_div).attr('data-name', shelf.name);
       $(shelf_div).find('h2').text(shelf.name);
 
-      $("#shelves").append(shelf_div);
+      $('nui-shelves').append(shelf_div);
     } else {
       shelf_div = shelf_div[0];
     }
 
     shelf.stories.forEach(story => {
-      var story_div = $(shelf_div).find('div [data-guid="' + story.metadata.guid + '"]');
+      var story_div = $(shelf_div).find('nui-cover[data-guid="' + story.metadata.guid + '"]');
       if (!story_div.length) {
-        story_div = $('#templates ' + (story.isTemplate ? '.template' : '.story')).clone();
+        story_div = $('nui-templates nui-cover' + (story.isTemplate ? '.template' : '.story')).clone();
         $(story_div).attr('data-guid', story.metadata.guid);
         $(story_div).find('h3').text(story.metadata.title);
 
-        $(shelf_div).find('.books').append(story_div);
+        $(shelf_div).find('nui-books').append(story_div);
       }
     });
   });
@@ -110,7 +110,7 @@ var bookcaseSyncTimer;
 function handleShowingPane(e) {
   switch ($(e.detail.pane).attr('id')) {
     case 'bookcase': {
-      bookcaseSyncTimer = setInterval(syncBookcase, 1000);
+      //bookcaseSyncTimer = setInterval(syncBookcase, 1000);
     } break;
 
     case 'story': {
