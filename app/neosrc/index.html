@@ -5,26 +5,6 @@
   <title>neo</title>
 
   <script>
-  var head = document.querySelector('head');
-
-  function titleCase(s) {
-    return s && s[0].toUpperCase() + s.slice(1);
-  }
-
-  function nameToClassName(name) {
-    return name.split('-').map(titleCase).join('');
-  }
-
-  function classFromClassName(className) {
-    try {
-      return eval(className);
-    } catch (e) {
-      return undefined;
-    }
-  }
-
-  var phTemplates = {};
-
   class PhElement extends HTMLElement {
     constructor() {
       super();
@@ -37,13 +17,33 @@
     }
   }
 
-  class PhComponents extends HTMLElement{
-    constructor() {
-      super();
+  {
+    var head = document.querySelector('head');
+
+    function titleCase(s) {
+      return s && s[0].toUpperCase() + s.slice(1);
     }
 
-    connectedCallback() {
-      this.querySelectorAll('template').forEach(function (template) {
+    function nameToClassName(name) {
+      return name.split('-').map(titleCase).join('');
+    }
+
+    function classFromClassName(className) {
+      try {
+        return eval(className);
+      } catch (e) {
+        return undefined;
+      }
+    }
+
+    function appendScript(script) {
+      var scriptNode = document.createElement('script');
+      scriptNode.innerHTML = script;
+      head.appendChild(scriptNode);
+    }
+
+    function loadComponents(root) {
+      root.querySelectorAll('template').forEach(function (template) {
         var tagName = template.getAttribute('name');
         if (!tagName) {
           return;
@@ -56,16 +56,34 @@
           head.appendChild(document.importNode(mainScript, true));
           template.content.removeChild(mainScript);
 
-          var customClass = classFromClassName(className);
-          customClass.tagName = tagName;
-          customClass.template = document.importNode(template, true);
-          customElements.define(tagName, customClass || PhElement);
         }
+
+        var customClass = classFromClassName(className);
+        if (!customClass) {
+          appendScript('class ' + className + ' extends PhElement {}');
+          customClass = classFromClassName(className);
+        }
+
+        customClass.tagName = tagName;
+        customClass.template = document.importNode(template, true);
+        customElements.define(tagName, customClass);
       });
     }
-  }
 
-  customElements.define('ph-components', PhComponents);
+    var linkObserver = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes && mutation.addedNodes.forEach(node => {
+          if (node.nodeName == 'LINK' && node.getAttribute('rel') == 'import') {
+            node.addEventListener('load', e => {
+              e.target.import.querySelectorAll('ph-components').forEach(loadComponents);
+            });
+          }
+        });
+      });
+    });
+
+    linkObserver.observe(head, {childList: true});
+  }
   </script>
 
   <link rel="stylesheet" href="css/nui.css">

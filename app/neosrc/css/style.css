@@ -85,27 +85,6 @@ nui-stage {
   height: 100%;
 }
 
-nui-stage>* {
-  visibility: hidden;
-}
-
-nui-stage>nui-pane.active {
-  visibility: visible;
-}
-
-nui-pane {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 100%;
-
-  background-color: #fff;
-
-  text-align: center;
-}
-
 .page_dialog {
   font-size: 120%;
 
