@@ -23,9 +23,9 @@
     }
   }
 
-  var pohTemplates = {};
+  var phTemplates = {};
 
-  class PohElement extends HTMLElement {
+  class PhElement extends HTMLElement {
     constructor() {
       super();
 
@@ -37,7 +37,7 @@
     }
   }
 
-  class PohComponents extends HTMLElement{
+  class PhComponents extends HTMLElement{
     constructor() {
       super();
     }
@@ -59,13 +59,13 @@
           var customClass = classFromClassName(className);
           customClass.tagName = tagName;
           customClass.template = document.importNode(template, true);
-          customElements.define(tagName, customClass || PohElement);
+          customElements.define(tagName, customClass || PhElement);
         }
       });
     }
   }
 
-  customElements.define('poh-components', PohComponents);
+  customElements.define('ph-components', PhComponents);
   </script>
 
   <link rel="stylesheet" href="css/nui.css">
@@ -128,8 +128,8 @@
       <h3></h3>
     </nui-cover>
   </nui-templates>
-  <poh-templates>
-  </poh-templates>
+  <ph-templates>
+  </ph-templates>
   <script src="js/main.js"></script>
 </body>
 </html>
