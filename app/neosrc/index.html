@@ -10,10 +10,14 @@
       super();
 
       var root = this.createShadowRoot();
-      root.appendChild(this.constructor.template.content);
+      root.appendChild(this.constructor.template.content.cloneNode(true));
     }
 
-    connectedCallback() {
+    attributeChangedCallback(attr, oldValue, newValue) {
+      debugger;
+      if (attr in this) {
+        this[attr] = newValue;
+      }
     }
   }
 
@@ -86,10 +90,13 @@
   }
   </script>
 
-  <link rel="stylesheet" href="css/nui.css">
   <link rel="stylesheet" href="css/style.css">
 
   <link rel="import" href="html/nui.html">
+  <link rel="import" href="html/nui-widgets.html">
+  <link rel="import" href="html/nui-tabs.html">
+  <link rel="import" href="html/nui-bookcase.html">
+  <link rel="import" href="html/nui-story.html">
 </head>
 
 <body>
@@ -115,39 +122,25 @@
       </nui-bookcase>
     </nui-pane>
     <nui-pane id="story">
-      <nui-gutter class="left">
-        <div class="story_nav">
-          <button class="icon">&#x25c0;</button>
-        </div>
-      </nui-gutter>
-      <nui-main>
-        <nui-work>
-        </nui-work>
-        <nui-tabs>
-        </nui-tabs>
-      </nui-main>
-      <nui-gutter class="right">
-        &nbsp;
-      </nui-gutter>
+      <nui-story>
+        <nui-gutter class="left">
+          <div class="story_nav">
+            <nui-button name="back">&#x25c0;</nui-button>
+          </div>
+        </nui-gutter>
+        <nui-main>
+          <nui-work>
+          </nui-work>
+          <nui-tabs>
+          </nui-tabs>
+        </nui-main>
+        <nui-gutter class="right">
+          &nbsp;
+        </nui-gutter>
+      </nui-story>
     </nui-pane>
   </nui-stage>
 
-  <nui-templates>
-    <nui-shelf>
-      <nui-books>
-      </nui-books>
-      <h2></h2>
-    </nui-shelf>
-    <nui-cover class="template">
-      <nui-icon>&#x2295;</nui-icon>
-      <h3></h3>
-    </nui-cover>
-    <nui-cover class="story">
-      <h3></h3>
-    </nui-cover>
-  </nui-templates>
-  <ph-templates>
-  </ph-templates>
   <script src="js/main.js"></script>
 </body>
 </html>

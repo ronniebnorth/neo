@@ -1,0 +1,37 @@
+<ph-components>
+  <template name="nui-icon">
+    <style>
+      :host {
+        font-size: 50pt;
+        color: #2f2;
+      }
+    </style>
+    <content></content>
+  </template>
+
+  <template name="nui-button">
+    <style>
+    :host {
+      display: inline-block;
+      outline: none;
+      width:1.5em;
+      height:1.5em;
+      line-height:1.5em;
+      border: 2px solid #f5f5f5;
+      border-radius: 50%;
+      text-align:center;
+      text-decoration:none;
+      background: #464646;
+      box-shadow: 0 0 3px gray;
+      font-size: 50pt;
+      font-weight:bold;
+      cursor: pointer;
+    }
+
+    span {
+      color: #fff;
+    }
+    </style>
+    <span><content></content></span>
+  </template>
+</ph-components>

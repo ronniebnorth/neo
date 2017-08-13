@@ -1,0 +1,96 @@
+<ph-components>
+  <template name="nui-bookcase">
+    <style>
+    :host {
+      display: block;
+      height: 100%;
+      overflow-y: scroll;
+    }
+    </style>
+    <content></content>
+  </template>
+
+  <template name="nui-shelves">
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <content></content>
+  </template>
+
+  <template name="nui-shelf">
+    <style>
+      :host {
+        display: block;
+        width: 100%;
+        background-color: #eee;
+        text-align: left;
+        padding: 1em;
+        margin-top: 1em;
+      }
+
+      h2 {
+        font-family: monospace;
+        text-align: left;
+      }
+
+      .books {
+        display: flex;
+      }
+
+      ::content nui-cover {
+        cursor: pointer;
+      }
+    </style>
+    <div class="books"><content></content></div>
+    <h2></h2>
+    <script>
+      class NuiShelf extends PhElement {
+        static get observedAttributes() {return ['shelfname']; }
+
+        get shelfname() {
+          return this.shadowRoot.querySelector('h2').textContent;
+        }
+
+        set shelfname(newName) {
+          this.shadowRoot.querySelector('h2').textContent = newName;
+        }
+      }
+    </script>
+  </template>
+
+  <template name="nui-cover">
+    <style>
+      :host {
+        height: 12em;
+        width: 10em;
+        background-color: #fff;
+        margin: 1em;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+    <nui-icon>&#x2295;</nui-icon>
+    <h3></h3>
+    <script>
+      class NuiCover extends PhElement {
+        get story() {
+          return this._story;
+        }
+
+        set story(newStory) {
+          this._story = newStory;
+          this.setAttribute('guid', this.story.metadata.guid);
+          this.shadowRoot.querySelector('h3').textContent = this.story.metadata.title;
+
+          this.shadowRoot.querySelector('nui-icon').style.visibility = this.story.isTemplate
+              ? 'visible' : 'hidden';
+        }
+      }
+    </script>
+  </template>
+</ph-components>

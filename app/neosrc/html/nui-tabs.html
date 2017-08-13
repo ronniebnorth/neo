@@ -1,0 +1,55 @@
+<ph-components>
+  <template name="nui-tabs">
+    <style>
+      :host {
+        margin: 0;
+        padding: 0;
+
+        display: flex;
+        flex: 0 0 2em;
+        flex-basis: row nowrap;
+        justify-content: space-between;
+      }
+      ::content>nui-tab {
+        font-family: monospace;
+        font-size: 12pt;
+        font-weight: bolder;
+
+        background-color: #fff;
+
+        margin-right: .25em;
+        padding: .5em;
+        opacity: .7;
+        border-radius: 0 0 .75em .75em;
+
+        flex: 0 1;
+      }
+
+      ::content>*:last-child {
+        margin-right: 0;
+      }
+
+      ::content>*.active {
+        opacity: 1.0;
+      }
+    </style>
+    <content></content>
+  </template>
+
+  <template name="nui-tab">
+    <style>
+
+    </style>
+    <content></content>
+  </template>
+
+  <template name="nui-tab-filler">
+    <style>
+      :host {
+        flex: 1 1;
+        opacity: 0;
+      }
+    </style>
+    <content></content>
+  </template>
+</ph-components>

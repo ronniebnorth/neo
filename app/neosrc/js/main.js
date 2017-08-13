@@ -14,11 +14,11 @@ const neo = require('neo');
 const log = require('log')
 
 function showPane(id) {
-  var hiding = $('#stage>div.pane.active');
+  var hiding = $('nui-stage>nui-pane.active');
   if (hiding.length) {
     document.dispatchEvent(new CustomEvent('hiding_pane', {detail: {pane: hiding[0]}}));
 
-    $('#stage>div.pane').removeClass('active');
+    $('nui-stage>nui-pane').removeClass('active');
   }
 
   var showing = $('#' + id);
@@ -57,10 +57,10 @@ function handleFormPost(e) {
 }
 
 function handleBookClick(e) {
-  var storyDiv = $(e.target).closest('.cover');
-  if (storyDiv.length) {
-    var guid = $(storyDiv).attr('data-guid');
-    var story = neo.Bookcase.storyFromGuid(guid);
+  var cover = $(e.target).closest('nui-cover');
+  if (cover.length) {
+    var story = cover[0].story;
+
     if (story) {
       neo.CurrentStory = story.isTemplate ? story.newStory() : story;
     }
@@ -69,11 +69,10 @@ function handleBookClick(e) {
 
 function syncBookcase() {
   neo.Bookcase.Shelves.forEach(shelf => {
-    var shelf_div = $('nui-shelves').find('nui-shelf[data-name="' + shelf.name + '"]');
+    var shelf_div = $('nui-shelves').find('nui-shelf[shelfname="' + shelf.name + '"]');
     if (!shelf_div.length) {
-      shelf_div = $('nui-templates nui-shelf').clone();
-      $(shelf_div).attr('data-name', shelf.name);
-      $(shelf_div).find('h2').text(shelf.name);
+      shelf_div = document.createElement('nui-shelf');
+      shelf_div.shelfname = shelf.name;
 
       $('nui-shelves').append(shelf_div);
     } else {
@@ -81,13 +80,12 @@ function syncBookcase() {
     }
 
     shelf.stories.forEach(story => {
-      var story_div = $(shelf_div).find('nui-cover[data-guid="' + story.metadata.guid + '"]');
+      var story_div = $(shelf_div).find('nui-cover[guid="' + story.metadata.guid + '"]');
       if (!story_div.length) {
-        story_div = $('nui-templates nui-cover' + (story.isTemplate ? '.template' : '.story')).clone();
-        $(story_div).attr('data-guid', story.metadata.guid);
-        $(story_div).find('h3').text(story.metadata.title);
+        story_div = document.createElement('nui-cover');
+        story_div.story = story;
 
-        $(shelf_div).find('nui-books').append(story_div);
+        $(shelf_div).append(story_div);
       }
     });
   });
@@ -96,9 +94,9 @@ function syncBookcase() {
 function initStoryPane() {
   var story = neo.CurrentStory;
 
-  $('#story .view_tabs').empty();
+  $('#story nui-tabs').empty();
   story.Tabs.forEach(function (tab) {
-    $('#story .view_tabs').append('<div>' + tab.name + '</div>');
+    $('#story nui-tabs').append('<nui-tab>' + tab.name + '</nui-tab>');
   });
 
   // !!!LATER!!! get default tab from prefs
@@ -132,9 +130,14 @@ function handleOpenStory(e) {
 }
 
 $(function () {
+  // initialize UI event handlers
   $(document).on('submit', handleFormPost);
+  $('nui-bookcase').on('click', handleBookClick);
+  $('nui-button[name=back]').on('click', e => {
+    showPane('bookcase');
+  });
 
-  $('#bookcase').on('click', handleBookClick);
+  // initialize app event handlers
   $(document).on('showing_pane', handleShowingPane);
   $(document).on('hiding_pane', handleHidingPane);
   $(document).on('open_story', handleOpenStory);

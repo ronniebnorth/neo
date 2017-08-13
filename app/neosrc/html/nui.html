@@ -5,8 +5,11 @@
         display: block;
       }
 
-      :host>* {
+      ::content>* {
         visibility: hidden;
+      }
+      ::content>*.active {
+        visibility: visible;
       }
     </style>
     <content></content>
