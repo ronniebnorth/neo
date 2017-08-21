@@ -43,18 +43,18 @@
         cursor: pointer;
       }
     </style>
-    <div class="books"><content></content></div>
+    <nui-hscroller><content></content></nui-hscroller>
     <h2></h2>
     <script>
       class NuiShelf extends PhElement {
-        static get observedAttributes() {return ['shelfname']; }
-
-        get shelfname() {
-          return this.shadowRoot.querySelector('h2').textContent;
+        get shelf() {
+          return this._shelf;
         }
 
-        set shelfname(newName) {
-          this.shadowRoot.querySelector('h2').textContent = newName;
+        set shelf(newShelf) {
+          this._shelf = newShelf;
+          this.setAttribute('shelfname', this.shelf.name);
+          this.shadowRoot.querySelector('h2').textContent = this.shelf.name;
         }
       }
     </script>
@@ -63,8 +63,10 @@
   <template name="nui-cover">
     <style>
       :host {
+        position: relative;
         height: 12em;
         width: 10em;
+        min-width: 10em;
         background-color: #fff;
         margin: 1em;
 
@@ -73,9 +75,40 @@
         align-items: center;
         justify-content: center;
       }
+
+      .controls {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        opacity: 0;
+        transition: opacity .5s ease-out;
+      }
+
+      .controls:hover {
+        opacity: 1;
+      }
+
+      h3 {
+        width: 95%;
+        word-wrap: break-word;
+        white-space: normal;
+        padding: 0 2.5%;
+      }
+
+      nui-delete-button {
+        position: absolute;
+        right: .5em;
+        top: .5em;
+      }
     </style>
     <nui-icon>&#x2295;</nui-icon>
     <h3></h3>
+    <div class="controls">
+      <nui-delete-button name="delete-story"/>
+    </div>
     <script>
       class NuiCover extends PhElement {
         get story() {
@@ -89,6 +122,8 @@
 
           this.shadowRoot.querySelector('nui-icon').style.visibility = this.story.isTemplate
               ? 'visible' : 'hidden';
+          this.shadowRoot.querySelector('.controls').style.visibility = this.story.isTemplate
+              ? 'hidden' : 'visible';
         }
       }
     </script>

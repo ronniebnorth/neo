@@ -23,7 +23,6 @@
       text-decoration:none;
       background: #464646;
       box-shadow: 0 0 3px gray;
-      font-size: 50pt;
       font-weight:bold;
       cursor: pointer;
     }
@@ -33,5 +32,66 @@
     }
     </style>
     <span><content></content></span>
+    <script>
+      class NuiButton extends PhElement {
+        constructor() {
+          super();
+
+          this.addEventListener('click', e => {
+            var detail = {};
+
+            if (this.getAttribute('name')) {
+              detail.buttonName = this.getAttribute('name');
+            }
+
+            this.dispatchEvent(new CustomEvent('nui-button-click', {bubbles: true, composed: true, detail}));
+            e.stopPropagation();
+
+            return false;
+          });
+
+          if (this.size) {
+            this.style.fontSize = this.size;
+          }
+        }
+
+        get size() {
+          return this.getAttribute('size');
+        }
+
+        set size(newSize) {
+          if (this.getAttribute('size') != newSize) {
+            this.setAttribute('size', newSize);
+          }
+
+          this.style.fontSize = newSize;
+        }
+      }
+    </script>
+  </template>
+
+  <template name="nui-delete-button">
+    <style>
+      nui-button {
+        background: red;
+      }
+    </style>
+
+    <nui-button name="delete">&#x2716;</nui-button>
+  </template>
+
+  <template name="nui-hscroller">
+    <style>
+      :host {
+        display: block;
+      }
+
+      div {
+        display: flex;
+        white-space: nowrap;
+        overflow-x: scroll;
+      }
+    </style>
+    <div><content></content></div>
   </template>
 </ph-components>

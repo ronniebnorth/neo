@@ -14,7 +14,6 @@
     }
 
     attributeChangedCallback(attr, oldValue, newValue) {
-      debugger;
       if (attr in this) {
         this[attr] = newValue;
       }
@@ -47,7 +46,7 @@
     }
 
     function loadComponents(root) {
-      root.querySelectorAll('template').forEach(function (template) {
+      root.querySelectorAll('template').forEach(template => {
         var tagName = template.getAttribute('name');
         if (!tagName) {
           return;
@@ -125,7 +124,7 @@
       <nui-story>
         <nui-gutter class="left">
           <div class="story_nav">
-            <nui-button name="back">&#x25c0;</nui-button>
+            <nui-button name="back" size="300%">&#x25c0;</nui-button>
           </div>
         </nui-gutter>
         <nui-main>

@@ -5,11 +5,8 @@ const electron = require('electron');
 const remote = electron.remote;
 const app = remote.app;
 
-const first_lines = fs.readJsonSync('./neosrc/first_lines.json');
-
 const $ = require('jquery');
 
-// !!!TODO!!! fix Electron module search logic, should be able to use 'neo'
 const neo = require('neo');
 const log = require('log')
 
@@ -67,16 +64,42 @@ function handleBookClick(e) {
   }
 }
 
+function handleCoverButtonClick(e) {
+  switch (e.detail.buttonName) {
+    case 'delete': {
+      var shelf = $(e.target).closest('nui-shelf')[0];
+      var story = e.target.story;
+
+      var i = story.metadata.keywords.indexOf(shelf.shelf.name);
+      if (i < 0) {
+        return;
+      }
+
+      if (story.metadata.keywords.length <= 1) {
+        // !!!LATER!!! confirm and delete document
+      }
+      story.metadata.keywords.splice(i, 1);
+      story.write();
+
+      syncBookcase();
+    } break;
+  }
+}
+
 function syncBookcase() {
+  document.querySelectorAll('nui-shelf').forEach(shelf => shelf.setAttribute('data-stale', true));
+  document.querySelectorAll('nui-cover').forEach(cover => cover.setAttribute('data-stale', true));
+
   neo.Bookcase.Shelves.forEach(shelf => {
     var shelf_div = $('nui-shelves').find('nui-shelf[shelfname="' + shelf.name + '"]');
     if (!shelf_div.length) {
       shelf_div = document.createElement('nui-shelf');
-      shelf_div.shelfname = shelf.name;
+      shelf_div.shelf = shelf;
 
       $('nui-shelves').append(shelf_div);
     } else {
       shelf_div = shelf_div[0];
+      shelf_div.setAttribute('data-stale', false);
     }
 
     shelf.stories.forEach(story => {
@@ -86,16 +109,23 @@ function syncBookcase() {
         story_div.story = story;
 
         $(shelf_div).append(story_div);
+      } else {
+        story_div = story_div[0];
+        story_div.setAttribute('data-stale', false);
       }
     });
+
+    document.querySelectorAll('*[data-stale=true]').forEach(node => node.remove());
   });
+
+  document.querySelectorAll('*')
 }
 
 function initStoryPane() {
   var story = neo.CurrentStory;
 
   $('#story nui-tabs').empty();
-  story.Tabs.forEach(function (tab) {
+  story.Tabs.forEach(tab => {
     $('#story nui-tabs').append('<nui-tab>' + tab.name + '</nui-tab>');
   });
 
@@ -108,7 +138,7 @@ var bookcaseSyncTimer;
 function handleShowingPane(e) {
   switch ($(e.detail.pane).attr('id')) {
     case 'bookcase': {
-      //bookcaseSyncTimer = setInterval(syncBookcase, 1000);
+      bookcaseSyncTimer = setInterval(syncBookcase, 1000);
     } break;
 
     case 'story': {
@@ -129,11 +159,21 @@ function handleOpenStory(e) {
   showPane('story');
 }
 
-$(function () {
+function handleOpenTab(e) {
+  var tab = e.detail.tab;
+
+  $('nui-tab').removeClass('active');
+  if (tab) {
+    $('nui-tab:contains("' + tab.name + '")').addClass('active');
+  }
+}
+
+$(() => {
   // initialize UI event handlers
   $(document).on('submit', handleFormPost);
   $('nui-bookcase').on('click', handleBookClick);
-  $('nui-button[name=back]').on('click', e => {
+  $('nui-bookcase').on('nui-button-click', handleCoverButtonClick);
+  $('nui-button[name=back]').on('nui-button-click', e => {
     showPane('bookcase');
   });
 
@@ -141,6 +181,7 @@ $(function () {
   $(document).on('showing_pane', handleShowingPane);
   $(document).on('hiding_pane', handleHidingPane);
   $(document).on('open_story', handleOpenStory);
+  $(document).on('open_tab', handleOpenTab);
 
   neo.BookcasePane = '#bookcase';
   neo.StoryPane = '#story';
