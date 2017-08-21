@@ -23,6 +23,11 @@ html {
   overflow: hidden;
 }
 
+html {
+  --ui-fade-in: .25s;
+  --ui-fade-out: 1s;
+}
+
 body {
   min-height: 100%;
 
@@ -102,12 +107,12 @@ p {
 
 .story_nav {
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transition: opacity var(--ui-fade-out) ease-in-out;
 }
 
 .story_nav:hover, .story_nav.hovered {
   opacity: 1;
-  transition: opacity .25s ease-in-out;
+  transition: opacity var(--ui-fade-in) ease-in-out;
 }
 
 nui-main {
@@ -119,16 +124,14 @@ nui-main {
   bottom: 0;
   left: 0;
   width: 100%;
-  background-color: red;
-  opacity: .5;
 }
 
 nui-tabs {
   max-height: 10em;
-  transition: max-height .25s ease-in-out;
+  transition: max-height var(--ui-fade-in) ease-in-out;
 }
 
 nui-tabs.collapsed {
   max-height: 0;
-  transition: max-height 1s ease-in-out;
+  transition: max-height var(--ui-fade-out) ease-in-out;
 }

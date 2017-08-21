@@ -182,7 +182,7 @@ function handleOpenTab(e) {
 
 $(() => {
   $('#tab_trigger').height($('nui-tabs').height());
-  
+
   // initialize UI event handlers
   $(document).on('submit', handleFormPost);
   $('nui-bookcase').on('click', handleBookClick);
@@ -196,6 +196,8 @@ $(() => {
   $(document).on('hiding_pane', handleHidingPane);
   $(document).on('open_story', handleOpenStory);
   $(document).on('open_tab', handleOpenTab);
+  $('#tab_trigger').on('mouseenter', e => $('nui-tabs').removeClass('collapsed'));
+  $('#tab_trigger').on('mouseleave', e => $('nui-tabs').addClass('collapsed'));
 
   neo.BookcasePane = '#bookcase';
   neo.StoryPane = '#story';
