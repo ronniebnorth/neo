@@ -99,3 +99,36 @@ p {
   font-size: 14pt;
   font-weight: 600;
 }
+
+.story_nav {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.story_nav:hover, .story_nav.hovered {
+  opacity: 1;
+  transition: opacity .25s ease-in-out;
+}
+
+nui-main {
+  position: relative;
+}
+
+#tab_trigger {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: red;
+  opacity: .5;
+}
+
+nui-tabs {
+  max-height: 10em;
+  transition: max-height .25s ease-in-out;
+}
+
+nui-tabs.collapsed {
+  max-height: 0;
+  transition: max-height 1s ease-in-out;
+}

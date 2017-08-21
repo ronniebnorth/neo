@@ -121,6 +121,16 @@ function syncBookcase() {
   document.querySelectorAll('*')
 }
 
+function previewStoryControls() {
+  $('.story_nav').addClass('hovered');
+  $('nui-tabs').removeClass('collapsed');
+
+  setTimeout(e => {
+    $('.story_nav').removeClass('hovered');
+    $('nui-tabs').addClass('collapsed');
+  }, 1000);
+}
+
 function initStoryPane() {
   var story = neo.CurrentStory;
 
@@ -131,6 +141,8 @@ function initStoryPane() {
 
   // !!!LATER!!! get default tab from prefs
   neo.CurrentTab = story.Tabs[0];
+
+  previewStoryControls();
 }
 
 var bookcaseSyncTimer;
@@ -169,6 +181,8 @@ function handleOpenTab(e) {
 }
 
 $(() => {
+  $('#tab_trigger').height($('nui-tabs').height());
+  
   // initialize UI event handlers
   $(document).on('submit', handleFormPost);
   $('nui-bookcase').on('click', handleBookClick);
