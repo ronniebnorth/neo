@@ -87,6 +87,7 @@ function handleCoverButtonClick(e) {
 }
 
 function handleTabClick(e) {
+  neo.CurrentStory.setPref('story.lastTab', e.detail.tab);
   neo.CurrentTab = e.detail.tab;
 }
 
@@ -143,8 +144,9 @@ function initStoryPane() {
     $('#story nui-tabs').append('<nui-tab>' + tab.name + '</nui-tab>');
   });
 
-  // !!!LATER!!! get default tab from prefs
-  neo.CurrentTab = story.Tabs[0];
+  var lastTabName = story.getPref('story.lastTab');
+  var lastTab = Math.max(story.Tabs.findIndex(tab => tab.name == lastTabName), 0);
+  neo.CurrentTab = story.Tabs[lastTab];
 
   previewStoryControls();
 }
