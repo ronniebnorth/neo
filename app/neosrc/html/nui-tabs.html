@@ -34,6 +34,28 @@
       }
     </style>
     <content></content>
+    <script>
+      class NuiTabs extends PhElement {
+        constructor() {
+          super();
+        }
+
+        connectedCallback() {
+          super.connectedCallback();
+
+          this.shadowRoot.addEventListener('click', e => {
+            var tab = e.target.closest('nui-tab');
+
+            if (tab) {
+              var detail = {tab: tab.textContent.trim()};
+
+              this.dispatchEvent(new CustomEvent('nui-tab-click', {bubbles: true, composed: true, detail}));
+              e.stopPropagation();
+            }
+          });
+        }
+      }
+    </script>
   </template>
 
   <template name="nui-tab">

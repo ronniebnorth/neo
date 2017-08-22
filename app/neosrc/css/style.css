@@ -117,6 +117,9 @@ p {
 
 nui-main {
   position: relative;
+
+  display: flex;
+  flex-direction: column;
 }
 
 #tab_trigger {
@@ -126,9 +129,21 @@ nui-main {
   width: 100%;
 }
 
+nui-work {
+  flex: 0 1 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
 nui-tabs {
+  flex: 0 0 2em;
+
   max-height: 10em;
   transition: max-height var(--ui-fade-in) ease-in-out;
+}
+
+nui-tabs:hover, nui-tabs:hover.collapsed {
+  max-height: 10em;
 }
 
 nui-tabs.collapsed {

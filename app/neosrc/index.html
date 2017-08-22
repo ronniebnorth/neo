@@ -13,11 +13,18 @@
       root.appendChild(this.constructor.template.content.cloneNode(true));
     }
 
+    connectedCallback() {}
+
+    disconnectedCallback() {}
+
     attributeChangedCallback(attr, oldValue, newValue) {
       if (attr in this) {
         this[attr] = newValue;
       }
     }
+
+
+    adoptedCallback(oldDocument, newDocument) {}
   }
 
   {
@@ -130,11 +137,11 @@
         <nui-main>
           <nui-work>
           </nui-work>
-          <nui-tabs>
-          </nui-tabs>
           <div id="tab_trigger">
             &nbsp;
           </div>
+          <nui-tabs>
+          </nui-tabs>
         </nui-main>
         <nui-gutter class="right">
           &nbsp;

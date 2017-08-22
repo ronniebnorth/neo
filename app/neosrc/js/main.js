@@ -86,6 +86,10 @@ function handleCoverButtonClick(e) {
   }
 }
 
+function handleTabClick(e) {
+  neo.CurrentTab = e.detail.tab;
+}
+
 function syncBookcase() {
   document.querySelectorAll('nui-shelf').forEach(shelf => shelf.setAttribute('data-stale', true));
   document.querySelectorAll('nui-cover').forEach(cover => cover.setAttribute('data-stale', true));
@@ -190,6 +194,7 @@ $(() => {
   $('nui-button[name=back]').on('nui-button-click', e => {
     showPane('bookcase');
   });
+  $('nui-tabs').on('nui-tab-click', handleTabClick);
 
   // initialize app event handlers
   $(document).on('showing_pane', handleShowingPane);
