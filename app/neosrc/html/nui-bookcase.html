@@ -125,6 +125,13 @@
           this.shadowRoot.querySelector('.controls').style.visibility = this.story.isTemplate
               ? 'hidden' : 'visible';
         }
+
+        refresh() {
+          var h3 = this.shadowRoot.querySelector('h3');
+          if (h3.textContent != this.story.metadata.title) {
+            h3.textContent = this.story.metadata.title;
+          }
+        }
       }
     </script>
   </template>

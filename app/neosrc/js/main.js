@@ -116,6 +116,8 @@ function syncBookcase() {
         $(shelf_div).append(story_div);
       } else {
         story_div = story_div[0];
+
+        story_div.refresh();
         story_div.setAttribute('data-stale', false);
       }
     });
@@ -156,6 +158,7 @@ var bookcaseSyncTimer;
 function handleShowingPane(e) {
   switch ($(e.detail.pane).attr('id')) {
     case 'bookcase': {
+      syncBookcase();
       bookcaseSyncTimer = setInterval(syncBookcase, 1000);
     } break;
 
