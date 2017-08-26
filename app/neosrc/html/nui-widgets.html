@@ -94,4 +94,32 @@
     </style>
     <div><content></content></div>
   </template>
+
+  <template name="nui-cursor">
+    <style>
+      :host {
+        width: .25em;
+        background-color: red;
+
+      }
+
+      :host(:focus) {
+        animation: blinker .7s infinite;
+      }
+
+      @keyframes blinker {
+        50% { opacity: 0; }
+      }
+    </style>
+    <span>&#8203;</span>
+    <script>
+      class NuiCursor extends PhElement {
+        connectedCallback() {
+          super.connectedCallback();
+
+          this.setAttribute('tabindex', '0');
+        }
+      }
+    </script>
+  </template>
 </ph-components>

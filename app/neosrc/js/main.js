@@ -31,6 +31,10 @@ function showNextPane() {
   }
 }
 
+function handleKeyEvent(e) {
+  console.log('app-level key event', e);
+}
+
 function userStartHandler(e) {
   var form = e.target;
 
@@ -193,6 +197,7 @@ $(() => {
   $('#tab_trigger').height($('nui-tabs').height());
 
   // initialize UI event handlers
+  $(document).on('keydown keyup keypress', handleKeyEvent);
   $(document).on('submit', handleFormPost);
   $('nui-bookcase').on('click', handleBookClick);
   $('nui-bookcase').on('nui-button-click', handleCoverButtonClick);
