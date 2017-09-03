@@ -54,6 +54,34 @@ class NeoElement extends PhElement {
     return node;
   }
 
+  get docLast() {
+    var node = this;
+
+    while (node.lastChild) {
+      node = node.lastChild;
+    }
+
+    return node;
+  }
+
+  get docPrev() {
+    if (this.isFirstContent) {
+      return null;
+    }
+
+    if (this.previousSibling) {
+      return this.previousSibling;
+    }
+
+    var node = this;
+
+    while (node.hasNeoParent && !node.previousSibling) {
+      node = node.parentNode;
+    }
+
+    return node.previousSibling.docLast;
+  }
+
   get cursor() {
     return this.root.querySelector('nui-cursor');
   }
@@ -66,11 +94,21 @@ class NeoElement extends PhElement {
     return this.hasNeoParent ? this.parentNode.findProperty(name) : null;
   }
 
-  moveCursor(chars) {
+  cursorLeft() {
     var cursor = this.cursor;
-    var range = cursor.range;
-    console.log(range);
-    console.log(range.startLocation);
+    var prev = cursor.docPrev;
+
+    if (cursor.parentNode == prev.parentNode) {
+      if (prev.nodeType == Node.TEXT_NODE && prev.textContent.length > 1) {
+        var range = new Range();
+        range.location = {container: prev, position: prev.textContent.length-1};
+        range.insertNode(cursor);
+      } else {
+        prev.parentNode.insertBefore(cursor, prev);
+      }
+    } else {
+      prev.parentNode.appendChild(cursor);
+    }
   }
 
   insert(data) {
@@ -188,8 +226,7 @@ Object.defineProperty(Range.prototype, 'startLocation', {
   },
 
   set: function (newLocation) {
-    this.startContainer = newLocation.container;
-    this.startPosition = newLocation.position;
+    this.setStart(newLocation.container, newLocation.position);
   }
 });
 
@@ -198,9 +235,8 @@ Object.defineProperty(Range.prototype, 'endLocation', {
     return {container: this.endContainer, position: this.endPosition};
   },
 
-  set function (newLocation) {
-    this.endContainer = newLocation.container;
-    this.endPosition = newLocation.position;
+  set: function (newLocation) {
+    this.setEnd(newLocation.container, newLocation.position);
   }
 });
 </script>
