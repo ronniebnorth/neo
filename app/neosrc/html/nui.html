@@ -33,6 +33,10 @@ class NeoElement extends PhElement {
     return this.isContent && this.parentNode === this.root && !this.previousSibling;
   }
 
+  get isLastContent() {
+    return this.isContent && this.parentNode == this.root && !this.nextSibling;
+  }
+
   get isUI() {
     return this.tagName.startsWith('NUI-');
   }
@@ -64,6 +68,16 @@ class NeoElement extends PhElement {
     return node;
   }
 
+  get docFirst() {
+    var node = this;
+
+    while (node.firstChild) {
+      node = node.firstChild;
+    }
+
+    return node;
+  }
+
   get docPrev() {
     if (this.isFirstContent) {
       return null;
@@ -79,7 +93,25 @@ class NeoElement extends PhElement {
       node = node.parentNode;
     }
 
-    return node.previousSibling.docLast;
+    return node.previousSibling && node.previousSibling.docLast;
+  }
+
+  get docNext() {
+    if (this.isLastContent) {
+      return null;
+    }
+
+    if (this.nextSibling) {
+      return this.nextSibling;
+    }
+
+    var node = this;
+
+    while (node.hasNeoParent && !node.nextSibling) {
+      node = node.parentNode;
+    }
+
+    return node.nextSibling && node.nextSibling.docFirst;
   }
 
   get cursor() {
@@ -98,6 +130,10 @@ class NeoElement extends PhElement {
     var cursor = this.cursor;
     var prev = cursor.docPrev;
 
+    if (!prev) {
+      return;
+    }
+
     if (cursor.parentNode == prev.parentNode) {
       if (prev.nodeType == Node.TEXT_NODE && prev.textContent.length > 1) {
         var range = new Range();
@@ -108,6 +144,27 @@ class NeoElement extends PhElement {
       }
     } else {
       prev.parentNode.appendChild(cursor);
+    }
+  }
+
+  cursorRight() {
+    var cursor = this.cursor;
+    var next = cursor.docNext;
+
+    if (!next) {
+      return;
+    }
+
+    if (cursor.parentNode == next.parentNode) {
+      if (next.nodeType == Node.TEXT_NODE && next.textContent.length > 1) {
+        var range = new Range();
+        range.location = {container: next, position: 1};
+        range.insertNode(cursor);
+      } else {
+        next.parentNode.insertBefore(cursor, next.nextSibling);
+      }
+    } else {
+      next.parentNode.insertBefore(cursor, next);
     }
   }
 

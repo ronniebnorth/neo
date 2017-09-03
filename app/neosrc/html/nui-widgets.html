@@ -98,10 +98,14 @@
   <template name="nui-cursor">
     <style>
       :host {
-        width: .25em;
+        width: 0;
         background-color: #333;
         min-height: 1em;
         display: inline-block;
+      }
+
+      :host::after {
+        content: "\258F";
       }
 
       :host(:focus) {
@@ -115,6 +119,7 @@
     </style>
     <span>&#8203;</span>
     <script>
+      // !!!TODO!!! make block character an option: http://www.fileformat.info/info/unicode/block/block_elements/images.htm
       class NuiCursor extends NeoElement {
         connectedCallback() {
           super.connectedCallback();
