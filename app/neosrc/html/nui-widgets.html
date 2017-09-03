@@ -33,7 +33,7 @@
     </style>
     <span><content></content></span>
     <script>
-      class NuiButton extends PhElement {
+      class NuiButton extends NeoElement {
         constructor() {
           super();
 
@@ -99,12 +99,14 @@
     <style>
       :host {
         width: .25em;
-        background-color: red;
-
+        background-color: #333;
+        min-height: 1em;
+        display: inline-block;
       }
 
       :host(:focus) {
         animation: blinker .7s infinite;
+        outline: 0px solid transparent;
       }
 
       @keyframes blinker {
@@ -113,13 +115,58 @@
     </style>
     <span>&#8203;</span>
     <script>
-      class NuiCursor extends PhElement {
+      class NuiCursor extends NeoElement {
         connectedCallback() {
           super.connectedCallback();
 
           this.setAttribute('tabindex', '0');
+          $(this).parents().each((i, node) => {
+            if (node.hasNeoParent) {
+              node.classList.add('nui-cursor');
+            }
+          });
+
+          this.focus();
+        }
+
+        disconnectedCallback() {
+          super.disconnectedCallback();
+
+          $('.nui-cursor').removeClass('nui-cursor');
+        }
+
+        get range() {
+          var range =  new Range();
+          range.selectNode(this);
+          range.collapse(true);
+
+          return range;
         }
       }
+    </script>
+  </template>
+
+  <template name="nui-anchor">
+    <style>
+    :host {
+      display: none;
+    }
+    </style>
+    <content></content>
+    <script>
+    class NuiAnchor extends NeoElement {}
+    </script>
+  </template>
+
+  <template name="nui-placeholder">
+    <style>
+    :host {
+      background-color: #FCFF94;
+    }
+    </style>
+    <content></content>
+    <script>
+    class NuiPlaceholder extends NeoElement {}
     </script>
   </template>
 </ph-components>

@@ -7,8 +7,9 @@ const app = remote.app;
 
 const $ = require('jquery');
 
+const log = require('log');
 const neo = require('neo');
-const log = require('log')
+const keyboard = require('keyboard');
 
 function showPane(id) {
   var hiding = $('nui-stage>nui-pane.active');
@@ -32,7 +33,6 @@ function showNextPane() {
 }
 
 function handleKeyEvent(e) {
-  console.log('app-level key event', e);
 }
 
 function userStartHandler(e) {

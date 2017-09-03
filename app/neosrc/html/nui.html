@@ -1,3 +1,209 @@
+<script>
+'use strict';
+
+/** Root class for all Neo custom elements. Contains helpers to facilitate
+document editing tasks. */
+class NeoElement extends PhElement {
+  constructor() {
+    super();
+  }
+
+  get root() {
+    var root = null;
+    var node = this;
+
+    while (node) {
+      if (node.nodeType == Node.ELEMENT_NODE) {
+        if (node.isContent) {
+          root = node;
+        }
+      }
+
+      node = node.parentNode;
+    }
+
+    return root;
+  }
+
+  get isContent() {
+    return this.tagName.startsWith('NEO-');
+  }
+
+  get isFirstContent() {
+    return this.isContent && this.parentNode === this.root && !this.previousSibling;
+  }
+
+  get isUI() {
+    return this.tagName.startsWith('NUI-');
+  }
+
+  get hasNeoParent() {
+    var parent = this.parentNode;
+
+    return parent && (parent.isContent || parent.isUI)
+  }
+
+  get contentParent() {
+    // !!!LATER!!! this will be necessary when we add style elements (e.g. <b>, <i>, etc.)
+    var node = this.parentNode;
+
+    while (node && !node.isContent) {
+      node = node.parentNode;
+    }
+
+    return node;
+  }
+
+  get cursor() {
+    return this.root.querySelector('nui-cursor');
+  }
+
+  findProperty(name) {
+    if (this[name] !== undefined) {
+      return this[name];
+    }
+
+    return this.hasNeoParent ? this.parentNode.findProperty(name) : null;
+  }
+
+  moveCursor(chars) {
+    var cursor = this.cursor;
+    var range = cursor.range;
+    console.log(range);
+    console.log(range.startLocation);
+  }
+
+  insert(data) {
+    var cursor = this.cursor;
+    var previous = cursor.previousSibling;
+
+    if (previous) {
+      previous.nodeValue = previous.nodeValue + data;
+    } else {
+      var tn = document.createTextNode(data);
+      cursor.parentNode.insertBefore(tn, cursor);
+    }
+  }
+
+  backspace() {
+    var cursor = this.cursor;
+    var prev = cursor.previousSibling;
+
+    if (prev) {
+      switch (prev.nodeType) {
+        case Node.TEXT_NODE: {
+          if (prev.nodeValue.length > 1) {
+            prev.nodeValue = prev.nodeValue.substring(0, prev.nodeValue.length-1);
+          } else {
+            prev.parentNode.removeChild(prev);
+          }
+        } break;
+
+        case Node.ELEMENT_NODE: {
+          if (prev.isContent) {
+            var range = new Range();
+            range.selectNodeContents(prev);
+            range.collapseToEnd();
+
+            cursor = cursor.parentNode.removeChild(cursor);
+            range.insertNode(cursor);
+          } else {
+            prev.parentNode.removeChild(prev);
+          }
+        }
+      }
+    } else {
+      var parent = cursor.parentNode;
+
+      if (!parent.isFirstContent) {
+        if (parent.textContent.trim().length <= 0) {
+          parent.parentNode.insertBefore(cursor.parentNode.removeChild(cursor), parent);
+          parent.parentNode.removeChild(parent);
+        } else {
+          if (parent.previousSibling) {
+            parent.previousSibling.append.apply(parent.previousSibling, Array.from(parent.childNodes));
+            parent.parentNode.removeChild(parent);
+          } else {
+            // !!!TODO!!! find next previous position
+            log.warn('backspace: handle hierarchical content')
+          }
+        }
+      }
+    }
+  }
+
+  lineBreak() {
+    var cursor = this.cursor;
+    var nextContainer = cursor.findProperty('nextContainer');
+    var parent = cursor.contentParent;
+    var range = new Range();
+    range.selectNodeContents(parent);
+    range.setStartBefore(cursor);
+
+    var newNode = document.createElement(nextContainer);
+    newNode.appendChild(range.extractContents());
+    parent.parentNode.insertBefore(newNode, parent.nextSibling);
+  }
+}
+
+
+Range.prototype.collapseToStart = function () {
+  this.collapse(true);
+}
+
+Range.prototype.collapseToEnd = function () {
+  this.collapse(false);
+}
+
+Range.prototype.shiftLocation = (location, chars) => {
+  var node = location.container;
+  var dir = Math.sign(chars);
+
+  while (chars > 0) {
+    switch (node.nodeType) {
+      case Node.ELEMENT_NODE: {
+
+      } break;
+      case Node.TEXT_NODE: {
+
+      } break;
+    }
+  }
+}
+
+Object.defineProperty(Range.prototype, 'location', {
+  get: function () {
+    return this.startLocation;
+  },
+
+  set: function (newLocation) {
+    this.startLocation =
+    this.endLocation = newLocation;
+  }
+});
+
+Object.defineProperty(Range.prototype, 'startLocation', {
+  get: function () {
+    return {container: this.startContainer, position: this.startPosition};
+  },
+
+  set: function (newLocation) {
+    this.startContainer = newLocation.container;
+    this.startPosition = newLocation.position;
+  }
+});
+
+Object.defineProperty(Range.prototype, 'endLocation', {
+  get: function () {
+    return {container: this.endContainer, position: this.endPosition};
+  },
+
+  set function (newLocation) {
+    this.endContainer = newLocation.container;
+    this.endPosition = newLocation.position;
+  }
+});
+</script>
 <ph-components>
   <template name="nui-stage">
     <style>
