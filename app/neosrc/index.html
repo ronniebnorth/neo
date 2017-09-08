@@ -64,8 +64,7 @@
         var mainScript = template.content.querySelector('script');
         if (mainScript) {
           head.appendChild(document.importNode(mainScript, true));
-          template.content.removeChild(mainScript);
-
+          mainScript.parentNode.removeChild(mainScript);
         }
 
         var customClass = classFromClassName(className);
@@ -133,6 +132,7 @@
           <div class="story_nav">
             <nui-button name="back" size="300%">&#x25c0;</nui-button>
           </div>
+          <nui-commands></nui-commands>
         </nui-gutter>
         <nui-main>
           <nui-work>

@@ -32,13 +32,21 @@ function showNextPane() {
   }
 }
 
+function currentPane() {
+  return $('nui-pane.active').attr('id');
+}
+
 function handleKeyEvent(e) {
+  if (currentPane() != 'story') {
+    return;
+  }
+
+  document.querySelector('nui-commands').processCommandKeyEvent(e);
 }
 
 function userStartHandler(e) {
   var form = e.target;
 
-  log.debug('full name', form.fullName.value);
   neo.CurrentUser.updateChunk('jpf_metadata', metadata => {
     metadata.fullName = form.fullName.value;
   });
@@ -49,7 +57,6 @@ const form_handlers = {
 }
 
 function handleFormPost(e) {
-  log.debug(e.target.name);
   form_handlers[e.target.name + 'Handler'](e);
 
   showNextPane();
@@ -193,6 +200,17 @@ function handleOpenTab(e) {
   }
 }
 
+var globalCommands = [
+  {
+    name: 'back',
+    fn: function () { showPane('bookcase'); }
+  },
+  {
+    name: 'exit',
+    fn: function () { process.exit(); }
+  }
+];
+
 $(() => {
   $('#tab_trigger').height($('nui-tabs').height());
 
@@ -218,6 +236,8 @@ $(() => {
   neo.StoryPane = '#story';
 
   neo.neoRoot = path.join(app.getPath('documents'), 'neo');
+
+  neo.registerCommands('neo', globalCommands);
 
   syncBookcase();
 

@@ -100,7 +100,6 @@
       :host {
         width: 0;
         background-color: #333;
-        min-height: 1em;
         display: inline-block;
       }
 
@@ -117,7 +116,7 @@
         50% { opacity: 0; }
       }
     </style>
-    <span>&#8203;</span>
+    <span></span>
     <script>
       // !!!TODO!!! make block character an option: http://www.fileformat.info/info/unicode/block/block_elements/images.htm
       class NuiCursor extends NeoElement {
@@ -172,6 +171,81 @@
     <content></content>
     <script>
     class NuiPlaceholder extends NeoElement {}
+    </script>
+  </template>
+
+  <template name="nui-commands">
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        bottom: 2em;
+        left: 2em;
+        background-color: #fff;
+        min-width: 12em;
+        min-height: 1em;
+
+        border-radius: .15em;
+
+        text-align: left;
+
+        opacity: 0;
+        transition: opacity .25s ease-in-out;
+      }
+
+      :host(.active) {
+        opacity: 1;
+      }
+    </style>
+    <div>
+      <div><span id="ctrlKey">&#x2303;</span><span id="altKey">&#x2325;</span><span id="metaKey">&#x2318;</span><span id="match"></span></div>
+      <div id="list"</div>
+    </div>
+    <script>
+      class NuiCommands extends PhElement {
+        connectedCallback() {
+          super.connectedCallback();
+
+          var self = this;
+
+          document.addEventListener('focusout', e => {
+              self.active = false;
+          });
+        }
+
+        get active() {
+          return this._active;
+        }
+
+        set active(newActive) {
+          this._active = newActive;
+          if (this._active) {
+            this.classList.add('active');
+          } else {
+            this.classList.remove('active');
+          }
+        }
+
+        syncModifiers(pke) {
+          var e = pke.originalEvent;
+
+          ['ctrlKey', 'altKey', 'metaKey'].forEach(key => {
+            this.shadowRoot.querySelector('#' + key).style.display = e[key] ? 'inline' : 'none';
+          });
+        }
+
+        processCommandKeyEvent(e) {
+          var pke = keyboard.processKeyEvent(e.originalEvent);
+
+          this.syncModifiers(pke);
+
+          if (pke.hasModifier != this.active) {
+            this.active = pke.hasModifier;
+          }
+
+
+        }
+      }
     </script>
   </template>
 </ph-components>
