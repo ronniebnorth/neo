@@ -23,8 +23,17 @@
       }
     }
 
-
     adoptedCallback(oldDocument, newDocument) {}
+
+    /** Execute querySelector against this node's shadowRoot. */
+    sq(query) {
+      return this.shadowRoot.querySelector(query);
+    }
+
+    /** Execute querySelectorAll against this node's shadowRoot. */
+    sqa(query) {
+      return this.shadowRoot.querySelectorAll(query);
+    }
   }
 
   {

@@ -237,7 +237,7 @@ $(() => {
 
   neo.neoRoot = path.join(app.getPath('documents'), 'neo');
 
-  neo.registerCommands('neo', globalCommands);
+  neo.registerCommands(neo, globalCommands);
 
   syncBookcase();
 

@@ -193,13 +193,32 @@
         transition: opacity .25s ease-in-out;
       }
 
+      .overlay {
+        font-family: courier, monospace;
+        font-weight: bold;
+      }
+
+      #match {
+      }
+
+      .ms {
+        color: #777;
+        font-weight: normal;
+      }
+
+      #list {
+        margin: 0;
+        padding: 0 0 0 1em;
+        list-style: none;
+      }
+
       :host(.active) {
-        opacity: 1;
+        opacity: .8;
       }
     </style>
-    <div>
+    <div class="overlay">
       <div><span id="ctrlKey">&#x2303;</span><span id="altKey">&#x2325;</span><span id="metaKey">&#x2318;</span><span id="match"></span></div>
-      <div id="list"</div>
+      <ul id="list"></ul>
     </div>
     <script>
       class NuiCommands extends PhElement {
@@ -218,12 +237,54 @@
         }
 
         set active(newActive) {
+          if (this._active == newActive) {
+            return;
+          }
+
           this._active = newActive;
           if (this._active) {
             this.classList.add('active');
           } else {
             this.classList.remove('active');
+
+            if (this._searchString) {
+              neo.execCommand(this.sq('#match').textContent, {searchString: this._searchString});
+            }
+
+            this.resetSearch();
           }
+        }
+
+        get searchString() {
+          return this._searchString;
+        }
+
+        set searchString(newSearchString) {
+
+          function commandToHtml(searchString, command) {
+            return command.name.replace(searchString, '<span class="ms">' + searchString + '</span>');
+          }
+
+          this._searchString = newSearchString;
+
+          var commands = neo.matchCommands(this._searchString);
+
+          if (commands.length) {
+            this.sq('#match').innerHTML = commandToHtml(this._searchString, commands[0]);
+            var $list = $(this.sq('#list'));
+            $list.empty();
+
+            commands.slice(1).forEach(command => {
+              $list.append('<li>' + commandToHtml(this._searchString, command) + '</li>');
+            });
+          } else {
+            this.sq('#match').textContent = this._searchString;
+            $(this.sq('#list')).empty();
+          }
+        }
+
+        resetSearch() {
+          this.searchString = '';
         }
 
         syncModifiers(pke) {
@@ -234,16 +295,78 @@
           });
         }
 
-        processCommandKeyEvent(e) {
-          var pke = keyboard.processKeyEvent(e.originalEvent);
+        rotateUp() {
+          var list = this.sq('#list');
+          if (!list.firstElementChild) {
+            return;
+          }
 
-          this.syncModifiers(pke);
+          var om = this.sq('#match').innerHTML;
+          this.sq('#match').innerHTML = list.firstElementChild.innerHTML;
+          list.removeChild(list.firstElementChild);
+          $(list).append('<li>' + om + '</li>');
+        }
+
+        rotateDown() {
+          var list = this.sq('#list');
+          if (!list.lastElementChild) {
+            return;
+          }
+
+          var om = this.sq('#match').innerHTML;
+          this.sq('#match').innerHTML = list.lastElementChild.innerHTML;
+          list.removeChild(list.lastElementChild);
+          $(list).prepend('<li>' + om + '</li>');
+        }
+
+        processCommandKeyEvent(e) {
+          var handled = false;
+          var pke = keyboard.processKeyEvent(e.originalEvent);
 
           if (pke.hasModifier != this.active) {
             this.active = pke.hasModifier;
           }
 
+          if (!this.active) {
+            return handled;
+          }
 
+          this.syncModifiers(pke);
+
+          if (pke.isChar) {
+            if (pke.originalEvent.type == 'keydown') {
+              this.searchString += pke.key;
+              handled = true;
+            }
+          } else {
+            handled = true;
+
+            switch (pke.command) {
+              case 'Escape': {
+                this.resetSearch();
+              } break;
+
+              case 'Backspace': {
+                if (this.searchString.length > 1) {
+                  this.searchString = this.searchString.substr(0, this.searchString.length-1);
+                } else {
+                  this.resetSearch();
+                }
+              } break;
+
+              case 'ArrowUp': {
+                this.rotateDown();
+              } break;
+
+              case 'ArrowDown': {
+                this.rotateUp();
+              } break;
+            }
+          }
+
+          if (handled) {
+            pke.originalEvent.preventDefault();
+          }
         }
       }
     </script>
