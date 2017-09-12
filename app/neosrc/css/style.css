@@ -114,6 +114,7 @@ p {
   transition: opacity var(--ui-fade-out) ease-in-out;
 
   text-align: left;
+  margin-top: 3em;
 }
 
 .story_nav:hover, .story_nav.hovered {

@@ -211,6 +211,17 @@ var globalCommands = [
   }
 ];
 
+var debugCommands = [
+  {
+    name: 'toggle inspector',
+    fn: function () { remote.getCurrentWindow().toggleDevTools(); }
+  },
+  {
+    name: 'reload',
+    fn: function () { location.reload(); }
+  }
+];
+
 $(() => {
   $('#tab_trigger').height($('nui-tabs').height());
 
@@ -238,6 +249,9 @@ $(() => {
   neo.neoRoot = path.join(app.getPath('documents'), 'neo');
 
   neo.registerCommands(neo, globalCommands);
+  if (log.debugging) {
+    neo.registerCommands(neo, debugCommands);
+  }
 
   syncBookcase();
 

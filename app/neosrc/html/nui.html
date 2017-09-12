@@ -212,7 +212,14 @@ class NeoElement extends PhElement {
 
       if (!parent.isFirstContent) {
         if (parent.textContent.trim().length <= 0) {
-          parent.parentNode.insertBefore(cursor.parentNode.removeChild(cursor), parent);
+          var docPrev = cursor.docPrev;
+
+          if (docPrev.isContent) {
+            docPrev.append(cursor.parentNode.removeChild(cursor));
+          } else {
+            docPrev.parentNode.append(cursor.parentNode.removeChild(cursor));
+          }
+          
           parent.parentNode.removeChild(parent);
         } else {
           if (parent.previousSibling) {
