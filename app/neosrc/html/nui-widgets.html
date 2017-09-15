@@ -101,6 +101,8 @@
         width: 0;
         background-color: #333;
         display: inline-block;
+        overflow: visible;
+        white-space: nowrap;
       }
 
       :host::after {
@@ -135,6 +137,8 @@
 
         disconnectedCallback() {
           super.disconnectedCallback();
+
+          delete this.lastLineLeft;
 
           $('.nui-cursor').removeClass('nui-cursor');
         }

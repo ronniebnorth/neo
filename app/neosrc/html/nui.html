@@ -1,6 +1,24 @@
 <script>
 'use strict';
 
+/** Extending the default Text object to support some neo element properties. */
+Object.defineProperty(Text.prototype, 'root', {
+  get: function () {
+    return 'root' in this.parentElement ? this.parentElement.root : null;
+  }
+});
+
+Object.defineProperty(Text.prototype, 'range', {
+  get: function () {
+    var range = new Range();
+
+    range.setStart(this, 0);
+    range.setEnd(this, this.textContent.length);
+
+    return range;
+  }
+});
+
 /** Root class for all Neo custom elements. Contains helpers to facilitate
 document editing tasks. */
 class NeoElement extends PhElement {
@@ -118,12 +136,53 @@ class NeoElement extends PhElement {
     return this.root.querySelector('nui-cursor');
   }
 
+  rangeFromPoint(x, y) {
+    var range = document.caretRangeFromPoint(x, y);
+
+    if (!range) {
+      return null;
+    }
+
+    var node = range.startContainer;
+
+    if (node.root) {
+      return range;
+    }
+
+    if (node.nodeType == Node.TEXT_NODE) {
+      node = node.parentElement;
+    }
+
+    var od = node.style.display;
+    node.style.display = 'none';
+
+    var nr = this.rangeFromPoint(x, y);
+
+    node.style.display = od;
+
+    return nr;
+  }
+
   findProperty(name) {
     if (this[name] !== undefined) {
       return this[name];
     }
 
     return this.hasNeoParent ? this.parentNode.findProperty(name) : null;
+  }
+
+  normalizeContent() {
+    var nl = this.childNodes;
+    var i = 1;
+
+    while (i < nl.length) {
+      if (nl[i].nodeType == Node.TEXT_NODE && nl[i-1].nodeType == Node.TEXT_NODE) {
+        nl[i-1].textContent += nl[i].textContent;
+        nl[i].parentNode.removeChild(nl[i]);
+      } else {
+        i++;
+      }
+    }
   }
 
   cursorLeft() {
@@ -145,6 +204,8 @@ class NeoElement extends PhElement {
     } else {
       prev.parentNode.appendChild(cursor);
     }
+
+    cursor.contentParent.normalizeContent();
   }
 
   cursorRight() {
@@ -166,6 +227,63 @@ class NeoElement extends PhElement {
     } else {
       next.parentNode.insertBefore(cursor, next);
     }
+
+    cursor.contentParent.normalizeContent();
+  }
+
+  _moveCursorVertical(dir) {
+    var cursor = this.cursor;
+
+    var point  = $(cursor).offset();
+    if ('lastLineLeft' in cursor) {
+      log.debug('lastLineLeft', cursor.lastLineLeft);
+      point.left = cursor.lastLineLeft;
+    }
+    point.top = dir < 0 ? point.top - 1 : point.top + $(cursor).height();
+
+    var checkEl = dir < 0 ? cursor.docPrev : cursor.docNext;
+
+    if (!checkEl) {
+      return;
+    }
+
+    var checkRange = checkEl.range;
+    if (dir < 0) {
+      checkRange.collapseToEnd();
+    } else {
+      checkRange.collapseToStart();
+    }
+
+    var range = this.rangeFromPoint(point.left, point.top);
+    var cr = cursor.root.lastElementChild.getBoundingClientRect();
+
+    while ((point.top >= 0 && point.top < cr.top + cr.height)
+          && (range
+                && (range.compareBoundaryPoints(Range.END_TO_START, checkRange) * dir  <= 0
+                      || (range.startOffset === 0 && point.left > 0)
+                    )
+             )
+        ) {
+      point.top += dir;
+      range = this.rangeFromPoint(point.left, point.top);
+    }
+
+    if (range) {
+      log.debug(range.startContainer.textContent, range.startOffset);
+      cursor = cursor.parentNode.removeChild(cursor);
+      range.insertNode(cursor);
+      cursor.lastLineLeft = point.left;
+
+      cursor.contentParent.normalizeContent();
+    }
+  }
+
+  cursorUp() {
+    this._moveCursorVertical(-1);
+  }
+
+  cursorDown() {
+    this._moveCursorVertical(1);
   }
 
   insert(data) {
@@ -219,7 +337,7 @@ class NeoElement extends PhElement {
           } else {
             docPrev.parentNode.append(cursor.parentNode.removeChild(cursor));
           }
-          
+
           parent.parentNode.removeChild(parent);
         } else {
           if (parent.previousSibling) {
