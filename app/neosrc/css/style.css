@@ -1,10 +1,5 @@
 *, *:before, *:after { box-sizing: inherit; }
 
-* {
-  font-family: Garamond, Baskerville, "Baskerville Old Face", "Hoefler Text", "Times New Roman", serif;
-  color: #333;
-}
-
 *:read-write:focus {
      outline: none;
 }
