@@ -134,6 +134,8 @@
             }
           });
 
+          this.syncSelection();
+
           this.focus();
         }
 
@@ -143,6 +145,8 @@
           delete this.lastLineLeft;
 
           $('.nui-cursor').removeClass('nui-cursor');
+
+          this.syncSelection();
         }
 
         get range() {
@@ -164,7 +168,16 @@
     </style>
     <content></content>
     <script>
-    class NuiAnchor extends NeoElement {}
+    class NuiAnchor extends NeoElement {
+      connectedCallback() {
+        this.syncSelection();
+      }
+
+      disconnectedCallback() {
+        this.syncSelection();
+      }
+
+    }
     </script>
   </template>
 
