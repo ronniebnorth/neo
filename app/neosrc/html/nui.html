@@ -136,6 +136,14 @@ class NeoElement extends PhElement {
     return this.root.querySelector('nui-cursor');
   }
 
+  get range() {
+    var range = new Range();
+
+    range.selectNode(this);
+
+    return range;
+  }
+
   rangeFromPoint(x, y) {
     var range = document.caretRangeFromPoint(x, y);
 
@@ -153,12 +161,12 @@ class NeoElement extends PhElement {
       node = node.parentElement;
     }
 
-    var od = node.style.display;
-    node.style.display = 'none';
+    var ow = $(node).width();
+    $(node).width(0);
 
     var nr = this.rangeFromPoint(x, y);
 
-    node.style.display = od;
+    $(node).width(ow);
 
     return nr;
   }
@@ -260,7 +268,7 @@ class NeoElement extends PhElement {
     while ((point.top >= 0 && point.top < cr.top + cr.height)
           && (range
                 && (range.compareBoundaryPoints(Range.END_TO_START, checkRange) * dir  <= 0
-                      || (range.startOffset === 0 && point.left > 0)
+                      || ((range.startContainer.nodeType == Node.TEXT_NODE && range.startOffset === 0) && point.left > 0)
                     )
              )
         ) {
