@@ -354,7 +354,7 @@
 
           if (pke.isChar) {
             if (pke.originalEvent.type == 'keydown') {
-              this.searchString += pke.key;
+              this.searchString += pke.key.toLowerCase();
               handled = true;
             }
           } else {

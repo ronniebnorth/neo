@@ -59,10 +59,29 @@ class NeoElement extends PhElement {
     return this.tagName.startsWith('NUI-');
   }
 
+  get isDetached() {
+    var parents = this.parents;
+
+    return parents.length <= 0 || parents[parents.length-1].nodeType != Node.DOCUMENT_NODE;
+  }
+
   get hasNeoParent() {
     var parent = this.parentNode;
 
     return parent && (parent.isContent || parent.isUI)
+  }
+
+  get parents() {
+    var pa = [];
+    var node = this;
+
+    while (node.parentNode) {
+      pa.push(node.parentNode);
+
+      node = node.parentNode;
+    }
+
+    return pa;
   }
 
   get contentParent() {
@@ -140,11 +159,30 @@ class NeoElement extends PhElement {
     return this.root && this.root.querySelector('nui-anchor');
   }
 
+  dropAnchor() {
+    var anchor = this.anchor;
+    if (anchor) {
+      anchor = anchor.parentNode.removeChild(anchor);
+    } else {
+      anchor = document.createElement('nui-anchor');
+    }
+
+    var cursor = this.cursor;
+    cursor.parentNode.insertBefore(anchor, cursor.nextSibling);
+  }
+
+  weighAnchor() {
+    var anchor = this.anchor;
+    if (anchor) {
+      anchor.parentNode.removeChild(anchor);
+    }
+  }
+
   get selectionRange() {
     var cursorRange = this.cursor && this.cursor.range;
     var anchorRange = this.anchor && this.anchor.range;
 
-    if (!cursorRange || !anchorRange) {
+    if (!cursorRange || !anchorRange || this.cursor.isDetached) {
       return null;
     }
 
@@ -214,6 +252,14 @@ class NeoElement extends PhElement {
     }
   }
 
+  unwrap() {
+    while (this.firstChild) {
+      this.parentNode.insertBefore(this.firstChild, this);
+    }
+
+    return this.parentNode.removeChild(this);
+  }
+
   syncSelection() {
     var sel = window.getSelection();
     var sr = this.selectionRange;
@@ -276,7 +322,6 @@ class NeoElement extends PhElement {
 
     var point  = $(cursor).offset();
     if ('lastLineLeft' in cursor) {
-      log.debug('lastLineLeft', cursor.lastLineLeft);
       point.left = cursor.lastLineLeft;
     }
     point.top = dir < 0 ? point.top - 1 : point.top + $(cursor).height();
@@ -309,7 +354,6 @@ class NeoElement extends PhElement {
     }
 
     if (range) {
-      log.debug(range.startContainer.textContent, range.startOffset);
       cursor = cursor.parentNode.removeChild(cursor);
       range.insertNode(cursor);
       cursor.lastLineLeft = point.left;
