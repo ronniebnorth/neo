@@ -450,7 +450,6 @@ class NeoElement extends PhElement {
   }
 }
 
-
 Range.prototype.collapseToStart = function () {
   this.collapse(true);
 }
@@ -459,20 +458,99 @@ Range.prototype.collapseToEnd = function () {
   this.collapse(false);
 }
 
-Range.prototype.shiftLocation = (location, chars) => {
-  var node = location.container;
-  var dir = Math.sign(chars);
+/** This function can be used to iterate through the nodes that are part of a
+range. It returns a series of subranges that contain the element and text nodes
+of the given range. The first call is made with no parameter, and subsequent
+calls should be made with the last range returned. The method returns null
+when subranges remain. */
+Range.prototype.next = function (subrange) {
+  function contains(parent, child) {
+    if (parent === child) {
+      return true;
+    }
 
-  while (chars > 0) {
+    while (child && child.parentNode !== parent) {
+      child = child.parentNode;
+    }
+
+    return !!child;
+  }
+
+  function isComplex(node) {
+    if (node.nodeType == Node.TEXT_NODE) {
+      return false;
+    }
+
+    for (var i = 0; i < node.childNodes.length; i++) {
+      if (node.childNodes[i].nodeType != Node.TEXT_NODE) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  if (this.collapsed) {
+    return null;
+  }
+
+  if (subrange === undefined) {
+    subrange = new Range();
+
+    var node = this.startContainer;
+    if (this.startContainer === this.endContainer) {
+      node = this.startContainer.childNodes[this.startOffset];
+    }
+
     switch (node.nodeType) {
-      case Node.ELEMENT_NODE: {
-
-      } break;
       case Node.TEXT_NODE: {
+        subrange.setStart(node, this.startOffset);
+        subrange.setEnd(node, node.textContent.length);
+      } break;
 
+      case Node.ELEMENT_NODE: {
+        subrange.setStart(node, this.startOffset);
+        subrange.setEnd(node, node.childNodes.length);
       } break;
     }
+
+    return subrange;
+  } else {
+    if (subrange.startContainer === this.endContainer) {
+      return null;
+    }
+
+    var node = subrange.endContainer;
+    while (node && !node.nextSibling) {
+      node = node.parentNode;
+    }
+
+    if (!node) {
+      return null;
+    }
+
+    node = node.nextSibling;
+
+    while (node && (contains(node, this.endContainer) || isComplex(node)) && node.firstChild) {
+      node = node.firstChild;
+    }
+
+    switch (node.nodeType) {
+      case Node.TEXT_NODE: {
+        subrange.setStart(node, 0);
+        subrange.setEnd(node, node === this.endContainer ? this.endOffset : node.textContent.length);
+      } break;
+
+      case Node.ELEMENT_NODE: {
+        subrange.setStart(node, 0);
+        subrange.setEnd(node, node == this.endContainer ? this.endOffset : node.childNodes.length);
+      } break;
+    }
+
+    return subrange;
   }
+
+  return null;
 }
 
 Object.defineProperty(Range.prototype, 'location', {
