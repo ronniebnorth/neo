@@ -193,6 +193,12 @@
         connectedCallback() {
           super.connectedCallback();
 
+          if (!this.parentNode.isContent) {
+            log.warn('cursor not in content element');
+
+            debugger;
+          }
+
           this.setAttribute('tabindex', '0');
           $(this).parents().each((i, node) => {
             if (node.hasNeoParent) {

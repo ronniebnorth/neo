@@ -13,6 +13,10 @@
     }
     </style>
     <content></content>
+    <script>
+      class NuiBookcase extends PhElement {
+      }
+    </script>
   </template>
 
   <template name="nui-shelves">
@@ -116,6 +120,20 @@
     </div>
     <script>
       class NuiCover extends PhElement {
+        connectedCallback() {
+          document.addEventListener('dragover', this._handleDragOver, false);
+
+          document.addEventListener('drop', this._handleDrop, false);
+        }
+
+        _handleDragOver(e) {
+        }
+
+        _handleDrop(e) {
+          debugger;
+          log.debug('bookcase:', e, e.dataTransfer);
+        }
+
         get story() {
           return this._story;
         }

@@ -36,6 +36,20 @@ function currentPane() {
   return $('nui-pane.active').attr('id');
 }
 
+function handleDragOver(e) {
+  e.preventDefault();
+
+  return false;
+}
+
+function handleDrop(e) {
+  log.debug(e);
+
+  e.preventDefault();
+
+  return false;
+}
+
 function handleKeyEvent(e) {
   if (currentPane() != 'story') {
     return;
@@ -226,6 +240,10 @@ $(() => {
   $('#tab_trigger').height($('nui-tabs').height());
 
   // initialize UI event handlers
+  document.addEventListener('dragover', handleDragOver, false);
+
+  document.addEventListener('drop', handleDrop, false);
+
   $(document).on('keydown keyup keypress', handleKeyEvent);
   $(document).on('submit', handleFormPost);
   $('nui-bookcase').on('click', handleBookClick);
