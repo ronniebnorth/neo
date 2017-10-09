@@ -36,6 +36,12 @@ function currentPane() {
   return $('nui-pane.active').attr('id');
 }
 
+function handleQuit() {
+  if (neo.CurrentStory) {
+    neo.CurrentStory.logEvent('closed');
+  }
+}
+
 function handleDragOver(e) {
   e.preventDefault();
 
@@ -189,6 +195,7 @@ function handleShowingPane(e) {
 
     case 'story': {
       initStoryPane();
+      neo.CurrentStory.logEvent('opened', {user: neo.CurrentUser.metadata});
     } break;
   }
 }
@@ -198,6 +205,11 @@ function handleHidingPane(e) {
     case 'bookcase': {
       clearInterval(bookcaseSyncTimer);
     } break;
+
+    case 'story': {
+      neo.CurrentStory.logEvent('closed');
+      neo.CurrentStory = null;
+    }
   }
 }
 
@@ -220,8 +232,8 @@ var globalCommands = [
     fn: function () { showPane('bookcase'); }
   },
   {
-    name: 'exit',
-    fn: function () { process.exit(); }
+    name: 'quit',
+    fn: function () { app.quit(); }
   }
 ];
 
@@ -233,11 +245,17 @@ var debugCommands = [
   {
     name: 'reload',
     fn: function () { location.reload(); }
+  },
+  {
+    name: 'toggle debug style',
+    fn: function () { $('body').toggleClass('debug'); }
   }
 ];
 
 $(() => {
   $('#tab_trigger').height($('nui-tabs').height());
+
+  app.on('quit', handleQuit);
 
   // initialize UI event handlers
   document.addEventListener('dragover', handleDragOver, false);

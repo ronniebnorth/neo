@@ -190,6 +190,10 @@ class NeoElement extends PhElement {
       return null;
     }
 
+    if (this.cursor.previousSibling === this.anchor || this.anchor.previousSibling == this.cursor) {
+      return null;
+    }
+
     var dir = cursorRange.compareBoundaryPoints(Range.END_TO_END, anchorRange);
     var range = new Range();
     range.startLocation = dir < 0 ? cursorRange.endLocation : anchorRange.endLocation;
@@ -367,11 +371,16 @@ class NeoElement extends PhElement {
   }
 
   cursorUp() {
-    this._moveCursorVertical(-1);
+    var cursor = this.cursor;
+    cursor.scrollIntoViewIfNeeded();
+
+    
   }
 
   cursorDown() {
-    this._moveCursorVertical(1);
+    var cursor = this.cursor;
+    cursor.scrollIntoViewIfNeeded();
+
   }
 
   insert(data) {

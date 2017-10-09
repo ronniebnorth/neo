@@ -132,9 +132,9 @@ nui-main {
 }
 
 nui-work {
-  flex: 0 1 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  flex: 1 1 100%;
+
+  overflow: hidden;
 }
 
 nui-tabs {
