@@ -172,7 +172,7 @@ class NeoElement extends PhElement {
     }
 
     var cursor = this.cursor;
-    cursor.parentNode.insertBefore(anchor, cursor.nextSibling);
+    cursor.parentNode.moveBefore(anchor, cursor.nextSibling);
   }
 
   weighAnchor() {
@@ -297,7 +297,7 @@ class NeoElement extends PhElement {
         range.location = {container: prev, position: prev.textContent.length-1};
         range.insertNode(cursor);
       } else {
-        prev.parentNode.insertBefore(cursor, prev);
+        prev.parentNode.moveBefore(cursor, prev);
       }
     } else {
       prev.parentNode.appendChild(cursor);
@@ -320,10 +320,10 @@ class NeoElement extends PhElement {
         range.location = {container: next, position: 1};
         range.insertNode(cursor);
       } else {
-        next.parentNode.insertBefore(cursor, next.nextSibling);
+        next.parentNode.moveBefore(cursor, next.nextSibling);
       }
     } else {
-      next.parentNode.insertBefore(cursor, next);
+      next.parentNode.moveBefore(cursor, next);
     }
 
     cursor.contentParent.normalizeContent();
@@ -331,17 +331,22 @@ class NeoElement extends PhElement {
 
   cursorUp() {
     var cursor = this.cursor;
+    var scroller = this.root.parentElement;
+    var container = scroller.parentElement;
 
     var point = $(cursor).offset();
     var currentRange = this.rangeFromPoint(point.left, point.top);
     point.top -= 1;
 
-    if (point.top <= 0) {
-      return;
+    if (point.top < 0) {
+      if (scroller.scrollTop <= 0) {
+        return;
+      }
+
+      scroller.scrollTop += point.top;
+      point.top = 0;
     }
 
-    var scroller = this.root.parentElement;
-    var container = scroller.parentElement;
     var containerTop = $(container).offset().top;
     var newRange;
 
@@ -406,6 +411,36 @@ class NeoElement extends PhElement {
       newRange.insertNode(cursor.parentNode.removeChild(cursor));
       cursor.scrollIntoViewIfNeeded();
     }
+  }
+
+  cursorHome() {
+    // !!!LATER!!! this is simplistic, but will work for now
+    var firstContent = this.root.firstElementChild;
+    firstContent.moveBefore(this.cursor, firstContent.firstChild);
+  }
+
+  cursorEnd() {
+    // !!!LATER!!! this is simplistic, but will work for now
+    var lastContent = this.root.lastElementChild;
+    lastContent.moveBefore(this.cursor, null);
+  }
+
+  moveBefore(node, referenceNode) {
+    if (node === referenceNode) {
+      return;
+    }
+
+    if (node.parentNode === this
+        && ((referenceNode && referenceNode.previousSibling == node)
+        || (!referenceNode && !node.nextSibling))) {
+      return;
+    }
+
+    if (node.parentNode) {
+      node = node.parentNode.removeChild(node);
+    }
+
+    this.insertBefore(node, referenceNode);
   }
 
   insert(data) {
