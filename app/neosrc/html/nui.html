@@ -92,7 +92,7 @@ class NeoElement extends PhElement {
     // !!!LATER!!! this will be necessary when we add style elements (e.g. <b>, <i>, etc.)
     var node = this.parentNode;
 
-    while (node && !node.isContent) {
+    while (node && node.isNeo && !node.isContent) {
       node = node.parentNode;
     }
 
@@ -212,30 +212,34 @@ class NeoElement extends PhElement {
   }
 
   rangeFromPoint(x, y) {
-    var range = document.caretRangeFromPoint(x, y);
+    var container = this.root.parentElement;
 
-    if (!range) {
-      return null;
-    }
+    var range = null;
 
-    var node = range.startContainer;
+    var ela = document.elementsFromPoint(x, y);
 
-    if (node.root) {
+    if (!ela.length) {
       return range;
     }
 
-    if (node.nodeType == Node.TEXT_NODE) {
-      node = node.parentElement;
+    var i = 0;
+    while (i < ela.length && !ela[i].isContent && ela[i] != container) {
+      ela[i]._display = ela[i].style.display;
+      ela[i].style.display = 'none';
+
+      i++;
     }
 
-    var ow = $(node).width();
-    $(node).width(0);
+    if (i < ela.length && ela[i].isContent) {
+      range = document.caretRangeFromPoint(x, y);
+    }
 
-    var nr = this.rangeFromPoint(x, y);
+    while (--i >= 0) {
+      ela[i].style.display = ela[i]._display;
+      delete ela[i]._display;
+    }
 
-    $(node).width(ow);
-
-    return nr;
+    return range;
   }
 
   findProperty(name) {
@@ -325,62 +329,83 @@ class NeoElement extends PhElement {
     cursor.contentParent.normalizeContent();
   }
 
-  _moveCursorVertical(dir) {
+  cursorUp() {
     var cursor = this.cursor;
 
-    var point  = $(cursor).offset();
-    if ('lastLineLeft' in cursor) {
-      point.left = cursor.lastLineLeft;
-    }
-    point.top = dir < 0 ? point.top - 1 : point.top + $(cursor).height();
+    var point = $(cursor).offset();
+    var currentRange = this.rangeFromPoint(point.left, point.top);
+    point.top -= 1;
 
-    var checkEl = dir < 0 ? cursor.docPrev : cursor.docNext;
-
-    if (!checkEl) {
+    if (point.top <= 0) {
       return;
     }
 
-    var checkRange = checkEl.range;
-    if (dir < 0) {
-      checkRange.collapseToEnd();
-    } else {
-      checkRange.collapseToStart();
+    var scroller = this.root.parentElement;
+    var container = scroller.parentElement;
+    var containerTop = $(container).offset().top;
+    var newRange;
+
+    while (point.top >= containerTop) {
+      newRange = this.rangeFromPoint(point.left, point.top);
+
+      if (newRange && !newRange.equals(currentRange)) {
+        break;
+      }
+
+      point.top--;
+      if (point.top < containerTop && scroller.scrollTop > 0) {
+        scroller.scrollTop--;
+
+        point.top = containerTop;
+      }
     }
 
-    var range = this.rangeFromPoint(point.left, point.top);
-    var cr = cursor.root.lastElementChild.getBoundingClientRect();
-
-    while ((point.top >= 0 && point.top < cr.top + cr.height)
-          && (range
-                && (range.compareBoundaryPoints(Range.END_TO_START, checkRange) * dir  <= 0
-                      || ((range.startContainer.nodeType == Node.TEXT_NODE && range.startOffset === 0) && point.left > 0)
-                    )
-             )
-        ) {
-      point.top += dir;
-      range = this.rangeFromPoint(point.left, point.top);
+    if (newRange && point.top >= containerTop) {
+      cursor.lastLineLeft = cursor.lastLineLeft || point.left;
+      newRange.insertNode(cursor.parentNode.removeChild(cursor));
+      cursor.scrollIntoViewIfNeeded();
     }
-
-    if (range) {
-      cursor = cursor.parentNode.removeChild(cursor);
-      range.insertNode(cursor);
-      cursor.lastLineLeft = point.left;
-
-      cursor.contentParent.normalizeContent();
-    }
-  }
-
-  cursorUp() {
-    var cursor = this.cursor;
-    cursor.scrollIntoViewIfNeeded();
-
-    
   }
 
   cursorDown() {
-    var cursor = this.cursor;
-    cursor.scrollIntoViewIfNeeded();
+    var scroller = this.root.parentElement;
+    var container = scroller.parentElement;
+    var containerBottom = $(container).offset().top + $(container).height();
 
+    var cursor = this.cursor;
+
+    var point = $(cursor).offset();
+    var currentRange = this.rangeFromPoint(point.left, point.top);
+    point.top += $(cursor).height();
+
+    if (point.top > containerBottom) {
+      return;
+    }
+
+    var newRange;
+
+    while (point.top <= containerBottom) {
+      newRange = this.rangeFromPoint(point.left, point.top);
+
+      if (newRange && !newRange.equals(currentRange) && newRange.startContainer !== cursor) {
+        break;
+      }
+
+      point.top++;
+      if (point.top > containerBottom) {
+        var lastScrollTop = scroller.scrollTop;
+        scroller.scrollTop++;
+        if (lastScrollTop != scroller.scrollTop) {
+          point.top = containerBottom;
+        }
+      }
+    }
+
+    if (newRange && point.top <= containerBottom) {
+      cursor.lastLineLeft = point.left;
+      newRange.insertNode(cursor.parentNode.removeChild(cursor));
+      cursor.scrollIntoViewIfNeeded();
+    }
   }
 
   insert(data) {
@@ -564,6 +589,11 @@ Range.prototype.next = function (subrange) {
   }
 
   return null;
+}
+
+Range.prototype.equals = function (range) {
+  return range && this.startContainer === range.startContainer && this.startOffset == range.startOffset
+      && this.endContainer === range.endContainer && this.endOffset == range.endOffset;
 }
 
 Object.defineProperty(Range.prototype, 'location', {
