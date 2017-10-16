@@ -445,6 +445,16 @@ class NeoElement extends PhElement {
 
   insert(data) {
     var cursor = this.cursor;
+    var $placeholder = $(cursor).parents('.placeholder');
+
+    if ($placeholder.length) {
+      $placeholder.append(cursor.parentNode.removeChild(cursor));
+      $placeholder.text(data);
+      $placeholder.append(cursor);
+      $placeholder.removeClass('placeholder');
+
+      return;
+    }
     var previous = cursor.previousSibling;
 
     if (previous) {

@@ -194,9 +194,7 @@
           super.connectedCallback();
 
           if (!this.parentNode.isContent) {
-            log.warn('cursor not in content element');
-
-            debugger;
+            log.warn('cursor not in content element; nearest contentParent', this.contentParent.tagName);
           }
 
           this.setAttribute('tabindex', '0');
@@ -250,18 +248,6 @@
       }
 
     }
-    </script>
-  </template>
-
-  <template name="nui-placeholder">
-    <style>
-    :host {
-      background-color: #FCFF94;
-    }
-    </style>
-    <content></content>
-    <script>
-    class NuiPlaceholder extends NeoElement {}
     </script>
   </template>
 
