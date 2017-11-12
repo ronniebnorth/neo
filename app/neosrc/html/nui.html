@@ -99,6 +99,12 @@ class NeoElement extends PhElement {
     return node;
   }
 
+  get nextContainer() {
+    var nextContainer = neo.getPref('nextContainer.' + this.tagName) || ('<' + this.tagName + '/>');
+
+    return $(nextContainer)[0];
+  }
+
   get docLast() {
     var node = this;
 
@@ -521,15 +527,21 @@ class NeoElement extends PhElement {
 
   lineBreak() {
     var cursor = this.cursor;
-    var nextContainer = cursor.findProperty('nextContainer');
     var parent = cursor.contentParent;
+    var nextContainer = parent.nextContainer;
     var range = new Range();
     range.selectNodeContents(parent);
     range.setStartBefore(cursor);
 
-    var newNode = document.createElement(nextContainer);
-    newNode.appendChild(range.extractContents());
-    parent.parentNode.insertBefore(newNode, parent.nextSibling);
+    var ip = nextContainer.querySelector('nui-ip');
+
+    if (ip) {
+      ip.parentNode.insertBefore(range.extractContents(), ip);
+      ip.parentNode.removeChild(ip);
+    } else {
+      nextContainer.appendChild(range.extractContents());
+    }
+    parent.parentNode.insertBefore(nextContainer, parent.nextSibling);
   }
 }
 

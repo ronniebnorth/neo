@@ -34,6 +34,10 @@
     sqa(query) {
       return this.shadowRoot.querySelectorAll(query);
     }
+
+    get templateElement() {
+      return this.constructor.template;
+    }
   }
 
   {
