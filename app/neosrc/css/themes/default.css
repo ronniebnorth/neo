@@ -1,7 +1,7 @@
-.placeholder span {
-  background-color: #fcfcc7;
+.placeholder {
+  color: #ccc;
 }
 
-.nui-cursor.placeholder span {
-  background-color: #F3F315;
+.nui-cursor.placeholder {
+  color: #ccc;
 }

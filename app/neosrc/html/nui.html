@@ -26,6 +26,10 @@ class NeoElement extends PhElement {
     super();
   }
 
+  remove() {
+    return this.parentNode.removeChild(this);
+  }
+
   get root() {
     var root = null;
     var node = this;
@@ -51,12 +55,55 @@ class NeoElement extends PhElement {
     return this instanceof NeoElement;
   }
 
+  get firstContent() {
+    return this.root.firstElementChild;
+  }
+
   get isFirstContent() {
-    return this.isContent && this.parentNode === this.root && !this.previousSibling;
+    return this === this.firstContent;
+  }
+
+  get lastContent() {
+    return this.root.lastElementChild;
   }
 
   get isLastContent() {
-    return this.isContent && this.parentNode == this.root && !this.nextSibling;
+    return this === this.lastContent;
+  }
+
+  get firstIP() {
+    var node = this;
+
+    while (node && !node.isContent) {
+      node = node.firstElementChild;
+    }
+
+    if (node) {
+      var range = new Range();
+      range.selectNodeContents(node);
+      range.collapseToStart();
+
+      return range;
+    } else {
+      return null;
+    }
+  }
+
+  get lastIP() {
+    var node = this;
+
+    while (node && !node.isContent) {
+      node = node.lastElementChild;
+    }
+
+    if (node) {
+      var range = new Range();
+      range.selectNodeContents(node);
+      range.collapseToEnd();
+      return range;
+    } else {
+      return null;
+    }
   }
 
   get isUI() {
@@ -172,7 +219,7 @@ class NeoElement extends PhElement {
   dropAnchor() {
     var anchor = this.anchor;
     if (anchor) {
-      anchor = anchor.parentNode.removeChild(anchor);
+      anchor = anchor.remove();
     } else {
       anchor = document.createElement('nui-anchor');
     }
@@ -184,8 +231,17 @@ class NeoElement extends PhElement {
   weighAnchor() {
     var anchor = this.anchor;
     if (anchor) {
-      anchor.parentNode.removeChild(anchor);
+      anchor.remove();
     }
+  }
+
+  selectAll() {
+    var anchor = this.anchor ? this.anchor.remove() : document.createElement('nui-anchor');
+    var fc = this.firstContent;
+    fc.insertBefore(anchor, fc.firstChild);
+
+    var lc = this.lastContent;
+    lc.appendChild(this.cursor.remove());
   }
 
   get selectionRange() {
@@ -263,7 +319,7 @@ class NeoElement extends PhElement {
     while (i < nl.length) {
       if (nl[i].nodeType == Node.TEXT_NODE && nl[i-1].nodeType == Node.TEXT_NODE) {
         nl[i-1].textContent += nl[i].textContent;
-        nl[i].parentNode.removeChild(nl[i]);
+        nl[i].remove();
       } else {
         i++;
       }
@@ -275,7 +331,7 @@ class NeoElement extends PhElement {
       this.parentNode.insertBefore(this.firstChild, this);
     }
 
-    return this.parentNode.removeChild(this);
+    return this.remove();
   }
 
   syncSelection() {
@@ -373,7 +429,7 @@ class NeoElement extends PhElement {
 
     if (newRange && point.top >= containerTop) {
       cursor.lastLineLeft = cursor.lastLineLeft || point.left;
-      newRange.insertNode(cursor.parentNode.removeChild(cursor));
+      newRange.insertNode(cursor.remove());
       cursor.scrollIntoViewIfNeeded();
     }
   }
@@ -414,7 +470,7 @@ class NeoElement extends PhElement {
 
     if (newRange && point.top <= containerBottom) {
       cursor.lastLineLeft = point.left;
-      newRange.insertNode(cursor.parentNode.removeChild(cursor));
+      newRange.insertNode(cursor.remove());
       cursor.scrollIntoViewIfNeeded();
     }
   }
@@ -443,7 +499,7 @@ class NeoElement extends PhElement {
     }
 
     if (node.parentNode) {
-      node = node.parentNode.removeChild(node);
+      node = node.remove();
     }
 
     this.insertBefore(node, referenceNode);
@@ -454,13 +510,14 @@ class NeoElement extends PhElement {
     var $placeholder = $(cursor).parents('.placeholder');
 
     if ($placeholder.length) {
-      $placeholder.append(cursor.parentNode.removeChild(cursor));
+      $placeholder.append(cursor.remove());
       $placeholder.text(data);
       $placeholder.append(cursor);
       $placeholder.removeClass('placeholder');
 
       return;
     }
+
     var previous = cursor.previousSibling;
 
     if (previous) {
@@ -473,6 +530,17 @@ class NeoElement extends PhElement {
 
   backspace() {
     var cursor = this.cursor;
+    var $placeholder = $(cursor).parents('.placeholder');
+
+    if ($placeholder.length) {
+      cursor.remove();
+      $placeholder.text('');
+      $placeholder.append(cursor);
+      $placeholder.removeClass('placeholder');
+
+      return;
+    }
+
     var prev = cursor.previousSibling;
 
     if (prev) {
@@ -481,7 +549,7 @@ class NeoElement extends PhElement {
           if (prev.nodeValue.length > 1) {
             prev.nodeValue = prev.nodeValue.substring(0, prev.nodeValue.length-1);
           } else {
-            prev.parentNode.removeChild(prev);
+            prev.remove();
           }
         } break;
 
@@ -491,10 +559,10 @@ class NeoElement extends PhElement {
             range.selectNodeContents(prev);
             range.collapseToEnd();
 
-            cursor = cursor.parentNode.removeChild(cursor);
+            cursor = cursor.remove();
             range.insertNode(cursor);
           } else {
-            prev.parentNode.removeChild(prev);
+            prev.remove();
           }
         }
       }
@@ -506,16 +574,16 @@ class NeoElement extends PhElement {
           var docPrev = cursor.docPrev;
 
           if (docPrev.isContent) {
-            docPrev.append(cursor.parentNode.removeChild(cursor));
+            docPrev.append(cursor.remove());
           } else {
-            docPrev.parentNode.append(cursor.parentNode.removeChild(cursor));
+            docPrev.parentNode.append(cursor.remove());
           }
 
-          parent.parentNode.removeChild(parent);
+          parent.remove();
         } else {
           if (parent.previousSibling) {
             parent.previousSibling.append.apply(parent.previousSibling, Array.from(parent.childNodes));
-            parent.parentNode.removeChild(parent);
+            parent.remove();
           } else {
             // !!!TODO!!! find next previous position
             log.warn('backspace: handle hierarchical content')
@@ -537,7 +605,7 @@ class NeoElement extends PhElement {
 
     if (ip) {
       ip.parentNode.insertBefore(range.extractContents(), ip);
-      ip.parentNode.removeChild(ip);
+      ip.remove();
     } else {
       nextContainer.appendChild(range.extractContents());
     }
